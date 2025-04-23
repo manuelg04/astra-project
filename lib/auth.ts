@@ -1,9 +1,5 @@
-/* ----------------------------------------------------------------
-   Helpers de autenticación para el cliente (browser-side)
------------------------------------------------------------------ */
 const TOKEN_COOKIE = "token";
 
-/* Utilidades básicas de cookies -------------------------------- */
 const setCookie = (name: string, value: string, days = 7) => {
   const expires = new Date(Date.now() + days * 864e5).toUTCString();
   document.cookie = `${name}=${value}; Path=/; SameSite=Lax; Expires=${expires}`;

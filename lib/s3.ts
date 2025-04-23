@@ -15,9 +15,6 @@ if (
   );
 }
 
-/* ------------------------------------------------------------------ */
-/*  Instancia única de S3 Client (se comparte gracias al hot-reload)   */
-/* ------------------------------------------------------------------ */
 declare global {
   // eslint-disable-next-line no-var
   var _s3Client: S3Client | undefined;
@@ -36,10 +33,6 @@ export const s3 =
 if (process.env.NODE_ENV !== "production") {
   global._s3Client = s3;
 }
-
-/* ------------------------------------------------------------------ */
-/*  Función principal: subir una imagen a partir de un Data URL        */
-/* ------------------------------------------------------------------ */
 
 /**
  * Sube una imagen codificada como data-URL (base64) al bucket S3
@@ -81,9 +74,6 @@ export async function uploadImageDataUrl(
   return `https://${AWS_S3_BUCKET}.s3.${AWS_REGION}.amazonaws.com/${key}`;
 }
 
-/* ------------------------------------------------------------------ */
-/*  Función genérica para buffers (por si la necesitas más adelante)   */
-/* ------------------------------------------------------------------ */
 export async function uploadBuffer(
   buffer: Buffer,
   mimeType: string,

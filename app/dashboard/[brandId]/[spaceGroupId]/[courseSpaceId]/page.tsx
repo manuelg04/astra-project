@@ -1,3 +1,5 @@
+"use client";
+
 import { prisma } from "@/lib/db";
 
 interface Params {
@@ -6,11 +8,7 @@ interface Params {
   courseSpaceId: string;
 }
 
-export default async function CourseSpacePage({
-  params,
-}: {
-  params: Params;
-}) {
+export default async function CourseSpacePage({ params }: { params: Params }) {
   const { brandId, spaceGroupId, courseSpaceId } = params;
 
   /* 1 · Query mínima de validación — comprueba pertenencia en cadena */
@@ -19,7 +17,7 @@ export default async function CourseSpacePage({
       id: courseSpaceId,
       spaceGroup: {
         id: spaceGroupId,
-        brandId,                    // asegura jerarquía correcta
+        brandId, // asegura jerarquía correcta
       },
     },
     include: {
@@ -48,7 +46,7 @@ export default async function CourseSpacePage({
 
       {/* Placeholder: aquí listarás los cursos */}
       <div className="mt-6 border rounded-lg p-6 text-gray-500">
-        Todavía no has añadido cursos.  
+        Todavía no has añadido cursos.
         <br />
         Usa el botón “Nuevo curso” cuando esté disponible.
       </div>

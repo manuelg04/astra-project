@@ -25,9 +25,6 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"; // Imp
 import { useRouter } from "next/navigation";
 import { getAuthToken } from "@/lib/auth";
 
-/* ──────────────────────────────────────────────────────────── */
-/*  Utilidades de formato / parseo para COP                    */
-/* ──────────────────────────────────────────────────────────── */
 const formatCOP = (value: number | null | undefined): string => {
   if (value === null || value === undefined || isNaN(value)) return "";
   return new Intl.NumberFormat("es-CO", {
@@ -305,13 +302,13 @@ export default function GettingStartedPage() {
                   <div className="relative">
                     <Input
                       id="price"
-                      type="text" // Use text to allow formatting
+                      type="text"
                       required={pricingType === "PAID"}
-                      value={price} // Bind to the formatted state
-                      onChange={handlePriceChange} // Use the specific handler
-                      className="text-base pl-8" // Add padding for currency symbol
+                      value={price}
+                      onChange={handlePriceChange}
+                      className="text-base pl-8"
                       placeholder="Ej: 100.000"
-                      inputMode="numeric" // Hint for mobile keyboards
+                      inputMode="numeric"
                     />
                     <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">
                       $

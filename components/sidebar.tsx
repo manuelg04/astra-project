@@ -1,18 +1,8 @@
-/* ------------------------------------------------------------------
-   components/layout/Sidebar.tsx
------------------------------------------------------------------- */
 "use client";
 
-import {
-  useState,
-  useEffect,
-} from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
-import {
-  Building2,
-  BookOpen,
-  Settings,
-} from "lucide-react";
+import { Building2, BookOpen, Settings } from "lucide-react";
 
 import {
   Select,
@@ -27,18 +17,11 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import {
-  Avatar,
-  AvatarFallback,
-  AvatarImage,
-} from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 
-import {
-  getUserProfile,
-  getAuthToken,
-  UserProfile,
-} from "@/lib/auth";
+import { getUserProfile, getAuthToken, UserProfile } from "@/lib/auth";
+import EditSpaceGroupDialog from "./space-groups/EditSpaceGroupDialog";
 
 /* --- tipos idénticos al endpoint /api/brands/tree ---------------- */
 interface CourseSpaceSummary {
@@ -51,6 +34,8 @@ interface SpaceGroupSummary {
   id: string;
   name: string;
   emoji: string | null;
+  isPublic: boolean;
+  color: string | null;
   pricingType: "FREE" | "PAID";
   price: string;
   courseSpaces: CourseSpaceSummary[];
@@ -69,6 +54,7 @@ export default function Sidebar() {
   const [brands, setBrands] = useState<BrandSummary[]>([]);
   const [selectedBrand, setSelectedBrand] = useState<string | undefined>();
   const [loading, setLoading] = useState(true);
+  const [editing, setEditing] = useState<SpaceGroupSummary | null>(null);
 
   /* 1 · Cargar perfil + brands ------------------------------------ */
   useEffect(() => {
@@ -112,10 +98,7 @@ export default function Sidebar() {
         {brands.length === 0 ? (
           <p className="text-sm text-gray-500">Sin comunidades</p>
         ) : (
-          <Select
-            value={selectedBrand}
-            onValueChange={setSelectedBrand}
-          >
+          <Select value={selectedBrand} onValueChange={setSelectedBrand}>
             <SelectTrigger className="w-full">
               <SelectValue placeholder="Select a brand" />
             </SelectTrigger>
@@ -150,7 +133,7 @@ export default function Sidebar() {
                   className="w-full"
                 >
                   <AccordionItem value={group.id}>
-                    <AccordionTrigger className="text-sm font-medium hover:no-underline justify-between w-full group">
+                    <AccordionTrigger className="text-sm font-medium hover:no-underline justify-between w-full">
                       <div className="flex items-center gap-2">
                         <span>{group.emoji ?? "🌐"}</span>
                         <span>{group.name}</span>
@@ -158,7 +141,11 @@ export default function Sidebar() {
                       <Button
                         variant="ghost"
                         size="icon"
-                        className="h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity"
+                        className="h-6 w-6 opacity-100 pointer-events-auto z-10"
+                        onClick={(e) => {
+                          e.stopPropagation(); // evita abrir/cerrar accordion
+                          setEditing(group); // abre modal
+                        }}
                       >
                         <Settings className="h-4 w-4" />
                       </Button>
@@ -187,6 +174,39 @@ export default function Sidebar() {
               ))}
           </>
         )}
+        {/* Modal edición */}
+        <EditSpaceGroupDialog
+          open={!!editing}
+          group={
+            editing
+              ? {
+                  ...editing,
+                  color: editing.color
+                    ? `#${editing.color.replace(/^#/, "")}`
+                    : null,
+                }
+              : null
+          }
+          onClose={() => setEditing(null)}
+          onSaved={(updated) => {
+            // Actualiza state local sin volver a hacer fetch
+            setBrands((prev) =>
+              prev.map((b) => ({
+                ...b,
+                spaceGroups: b.spaceGroups.map((sg) =>
+                  sg.id === updated!.id
+                    ? {
+                        ...sg,
+                        ...updated,
+                        /* guardamos color sin # para ser coherentes con la DB */
+                        color: updated!.color?.replace(/^#/, "") ?? null,
+                      }
+                    : sg,
+                ),
+              })),
+            );
+          }}
+        />
       </div>
 
       {/* Sección 3: User Info */}
