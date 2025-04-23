@@ -12,4 +12,4 @@ export const prisma =
 
 if (process.env.NODE_ENV !== "production") global.prisma = prisma;
 
-//hola
+//hola xd
