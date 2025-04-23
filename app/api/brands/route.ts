@@ -1,9 +1,10 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { verifyJWT } from "@/lib/jwt";
-import { createCommunitySchema } from "@/lib/validators";
+
 import { uploadBuffer } from "@/lib/s3";
 import { Prisma } from "@prisma/client";
+import { createCommunitySchema } from "@/lib/validators";
 
 /* ------------------------------------------------------------------ */
 /*  POST /api/brands – On-boarding inicial de comunidad                */

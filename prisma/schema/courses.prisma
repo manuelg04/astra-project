@@ -19,6 +19,7 @@ model Course {
   id            String      @id @default(cuid())
   name          String
   description   String?
+  image         String?
   courseSpaceId String
   courseSpace   CourseSpace @relation(fields: [courseSpaceId], references: [id], onDelete: Cascade)
 
