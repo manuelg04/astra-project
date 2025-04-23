@@ -1,0 +1,16 @@
+model Brand {
+  id        String   @id @default(cuid())
+  name      String
+  emoji     String?
+  color     String?
+  logoUrl   String?
+  creatorId String
+  creator   User     @relation(fields: [creatorId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([id])
+  @@index([createdAt])
+  @@index([updatedAt])
+  @@map("brands")
+}
