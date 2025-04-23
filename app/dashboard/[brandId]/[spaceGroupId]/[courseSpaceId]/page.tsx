@@ -1,5 +1,3 @@
-"use client";
-
 import { prisma } from "@/lib/db";
 
 interface Params {
@@ -9,7 +7,11 @@ interface Params {
 }
 
 export default async function CourseSpacePage({ params }: { params: Params }) {
-  const { brandId, spaceGroupId, courseSpaceId } = params;
+  const [brandId, spaceGroupId, courseSpaceId] = await Promise.all([
+    params.brandId,
+    params.spaceGroupId,
+    params.courseSpaceId,
+  ]);
 
   /* 1 · Query mínima de validación — comprueba pertenencia en cadena */
   const courseSpace = await prisma.courseSpace.findFirst({
