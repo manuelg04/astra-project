@@ -3,7 +3,6 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Building2, BookOpen, Settings } from "lucide-react";
-
 import {
   Select,
   SelectContent,
@@ -20,70 +19,42 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 
-import { getUserProfile, getAuthToken, UserProfile } from "@/lib/auth";
+import { getUserProfile, UserProfile } from "@/lib/auth";
 import EditSpaceGroupDialog from "./space-groups/EditSpaceGroupDialog";
 import ThemeToggle from "./ThemeToggle";
-
-/* --- tipos idénticos al endpoint /api/brands/tree ---------------- */
-interface CourseSpaceSummary {
-  id: string;
-  title: string;
-  coursesCount: number;
-}
-
-interface SpaceGroupSummary {
-  id: string;
-  name: string;
-  emoji: string | null;
-  isPublic: boolean;
-  color: string | null;
-  pricingType: "FREE" | "PAID";
-  price: string;
-  courseSpaces: CourseSpaceSummary[];
-}
-
-interface BrandSummary {
-  id: string;
-  name: string;
-  logoUrl: string | null;
-  spaceGroups: SpaceGroupSummary[];
-}
+import {
+  BrandSummary,
+  CourseSpaceSummary,
+  mutateBrandsTree,
+  SpaceGroupSummary,
+  useBrandsTree,
+} from "@/hooks/useBrandsTree";
 
 /* ---------------------------------------------------------------- */
 export default function Sidebar() {
+  /* 1 · perfil del usuario ---------------------------------------- */
   const [user, setUser] = useState<UserProfile | null>(null);
-  const [brands, setBrands] = useState<BrandSummary[]>([]);
-  const [selectedBrand, setSelectedBrand] = useState<string | undefined>();
-  const [loading, setLoading] = useState(true);
-  const [editing, setEditing] = useState<SpaceGroupSummary | null>(null);
-
-  /* 1 · Cargar perfil + brands ------------------------------------ */
   useEffect(() => {
-    (async () => {
-      try {
-        const profile = await getUserProfile();
-        if (profile) setUser(profile);
-
-        const token = getAuthToken();
-        if (!token) return;
-
-        const res = await fetch("/api/brands/tree", {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        if (!res.ok) throw new Error("Cannot fetch brands");
-
-        const data = (await res.json()) as { brands: BrandSummary[] };
-        setBrands(data.brands);
-        if (data.brands.length) setSelectedBrand(data.brands[0].id);
-      } catch {
-        // Si falla, mantén el sidebar vacío
-      } finally {
-        setLoading(false);
-      }
-    })();
+    getUserProfile()
+      .then(setUser)
+      .catch(() => {});
   }, []);
 
-  if (loading) {
+  /* 2 · brands vía SWR ------------------------------------------- */
+  const { data, error, isLoading } = useBrandsTree();
+  const brands: BrandSummary[] = data?.brands ?? [];
+
+  /* 3 · brand seleccionada --------------------------------------- */
+  const [selectedBrand, setSelectedBrand] = useState<string | undefined>();
+  useEffect(() => {
+    if (!selectedBrand && brands.length) setSelectedBrand(brands[0].id);
+  }, [brands, selectedBrand]);
+
+  /* 4 · modal edición -------------------------------------------- */
+  const [editing, setEditing] = useState<SpaceGroupSummary | null>(null);
+
+  /* ----------------- estados de carga / error ------------------- */
+  if (isLoading) {
     return (
       <div className="w-64 h-full flex items-center justify-center border-r border-gray-200 dark:border-gray-700">
         <div className="w-6 h-6 border-4 border-purple-600 border-t-transparent rounded-full animate-spin" />
@@ -91,10 +62,18 @@ export default function Sidebar() {
     );
   }
 
-  /* ---------------------------------------------------------------- */
+  if (error) {
+    return (
+      <div className="w-64 h-full flex items-center justify-center border-r border-gray-200 dark:border-gray-700">
+        <p className="text-sm text-gray-500">Error al cargar comunidades</p>
+      </div>
+    );
+  }
+
+  /* --------------------------- UI ------------------------------- */
   return (
     <div className="w-64 h-full bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 flex flex-col">
-      {/* Sección 1: Brand Selector */}
+      {/* Selector de Brand ------------------------------------------------ */}
       <div className="p-4 border-b border-gray-200 dark:border-gray-700">
         {brands.length === 0 ? (
           <p className="text-sm text-gray-500">Sin comunidades</p>
@@ -114,7 +93,7 @@ export default function Sidebar() {
         )}
       </div>
 
-      {/* Sección 2: Space Groups */}
+      {/* Space Groups ---------------------------------------------------- */}
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
         <h2 className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
           Space Groups
@@ -123,59 +102,58 @@ export default function Sidebar() {
         {brands.length === 0 || !selectedBrand ? (
           <p className="text-sm text-gray-500">Crea tu primera comunidad.</p>
         ) : (
-          <>
-            {brands
-              .find((b) => b.id === selectedBrand)!
-              .spaceGroups.map((group) => (
-                <Accordion
-                  key={group.id}
-                  type="single"
-                  collapsible
-                  className="w-full"
-                >
-                  <AccordionItem value={group.id}>
-                    <AccordionTrigger className="text-sm font-medium hover:no-underline justify-between w-full">
-                      <div className="flex items-center gap-2">
-                        <span>{group.emoji ?? "🌐"}</span>
-                        <span>{group.name}</span>
-                      </div>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-6 w-6 opacity-100 pointer-events-auto z-10"
-                        onClick={(e) => {
-                          e.stopPropagation(); // evita abrir/cerrar accordion
-                          setEditing(group); // abre modal
-                        }}
-                      >
-                        <Settings className="h-4 w-4" />
-                      </Button>
-                    </AccordionTrigger>
-                    <AccordionContent>
-                      <ul className="space-y-1 pl-4">
-                        {group.courseSpaces.map((cs) => (
-                          <li key={cs.id}>
-                            <Link
-                              href={`/dashboard/${selectedBrand}/${group.id}/${cs.id}`}
+          brands
+            .find((b) => b.id === selectedBrand)!
+            .spaceGroups.map((group: SpaceGroupSummary) => (
+              <Accordion
+                key={group.id}
+                type="single"
+                collapsible
+                className="w-full"
+              >
+                <AccordionItem value={group.id}>
+                  <AccordionTrigger className="text-sm font-medium hover:no-underline justify-between w-full">
+                    <div className="flex items-center gap-2">
+                      <span>{group.emoji ?? "🌐"}</span>
+                      <span>{group.name}</span>
+                    </div>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-6 w-6 z-10"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setEditing(group);
+                      }}
+                    >
+                      <Settings className="h-4 w-4" />
+                    </Button>
+                  </AccordionTrigger>
+                  <AccordionContent>
+                    <ul className="space-y-1 pl-4">
+                      {group.courseSpaces.map((cs: CourseSpaceSummary) => (
+                        <li key={cs.id}>
+                          <Link
+                            href={`/dashboard/${selectedBrand}/${group.id}/${cs.id}`}
+                          >
+                            <Button
+                              variant="ghost"
+                              className="w-full justify-start text-sm font-normal h-8 px-2"
                             >
-                              <Button
-                                variant="ghost"
-                                className="w-full justify-start text-sm font-normal h-8 px-2"
-                              >
-                                <BookOpen className="mr-2 h-4 w-4" />
-                                {cs.title}
-                              </Button>
-                            </Link>
-                          </li>
-                        ))}
-                      </ul>
-                    </AccordionContent>
-                  </AccordionItem>
-                </Accordion>
-              ))}
-          </>
+                              <BookOpen className="mr-2 h-4 w-4" />
+                              {cs.title}
+                            </Button>
+                          </Link>
+                        </li>
+                      ))}
+                    </ul>
+                  </AccordionContent>
+                </AccordionItem>
+              </Accordion>
+            ))
         )}
-        {/* Modal edición */}
+
+        {/* Modal edición ------------------------------------------- */}
         <EditSpaceGroupDialog
           open={!!editing}
           group={
@@ -189,29 +167,13 @@ export default function Sidebar() {
               : null
           }
           onClose={() => setEditing(null)}
-          onSaved={(updated) => {
-            // Actualiza state local sin volver a hacer fetch
-            setBrands((prev) =>
-              prev.map((b) => ({
-                ...b,
-                spaceGroups: b.spaceGroups.map((sg) =>
-                  sg.id === updated!.id
-                    ? {
-                        ...sg,
-                        ...updated,
-                        /* guardamos color sin # para ser coherentes con la DB */
-                        color: updated!.color?.replace(/^#/, "") ?? null,
-                      }
-                    : sg,
-                ),
-              })),
-            );
-          }}
+          onSaved={() => mutateBrandsTree()} // refetch global
         />
       </div>
+
       <ThemeToggle />
 
-      {/* Sección 3: User Info */}
+      {/* Info usuario --------------------------------------------------- */}
       {user && (
         <div className="p-4 border-t border-gray-200 dark:border-gray-700">
           <div className="flex items-center justify-between">

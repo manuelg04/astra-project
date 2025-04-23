@@ -25,6 +25,8 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"; // Imp
 import { useRouter } from "next/navigation";
 import { getAuthToken } from "@/lib/auth";
 import { useToast } from "@/components/ui/use-toast";
+import { mutate } from "swr";
+import { mutateBrandsTree } from "@/hooks/useBrandsTree";
 
 const formatCOP = (value: number | null | undefined): string => {
   if (value === null || value === undefined || isNaN(value)) return "";
@@ -142,12 +144,14 @@ export default function GettingStartedPage() {
         description: "Comunidad creada con éxito.",
         variant: "default",
       });
+      mutateBrandsTree();
       router.push("/dashboard"); // o `/dashboard/${json.brand.id}`
     } catch (err) {
       console.error(err);
       toast({
         title: "Error",
-        description: err instanceof Error ? err.message : "No se pudo crear la comunidad",
+        description:
+          err instanceof Error ? err.message : "No se pudo crear la comunidad",
         variant: "destructive",
       });
     } finally {
