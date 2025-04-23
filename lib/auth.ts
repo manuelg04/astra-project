@@ -88,6 +88,7 @@ export async function setupUserProfile(
 export interface UserProfile {
   id: string;
   email: string;
+  avatarUrl: string | null;
   fullName: string;
   profilePicture: string | null;
 }
@@ -115,6 +116,7 @@ export async function getUserProfile(): Promise<UserProfile | null> {
     email: user.email,
     fullName: user.name ?? "",
     profilePicture: user.avatarUrl ?? null,
+    avatarUrl: user.avatarUrl ?? null,
   };
 }
 

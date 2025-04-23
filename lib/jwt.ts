@@ -9,7 +9,7 @@ export interface JWTPayload {
 
 export const signJWT = (
   payload: JWTPayload,
-  expires: string | number = "15m",
+  expires: string | number = "8h",
 ) => {
   const options: SignOptions = { expiresIn: expires };
   return jwt.sign(payload, SECRET, options);

@@ -31,9 +31,7 @@ export async function GET(req: Request) {
 
   /* 3 · Respuesta ---------------------------------------------------- */
   return NextResponse.json(
-    brand
-      ? { completed: true, brandId: brand.id }
-      : { completed: false },
+    brand ? { completed: true, brandId: brand.id } : { completed: false },
     { status: 200 },
   );
 }

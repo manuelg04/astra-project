@@ -14,7 +14,7 @@ export default async function GettingStartedGuardLayout({
   children: ReactNode;
 }) {
   /* 1 · Autenticación (middleware global ya exige token) */
-  const userId = await getCurrentUserId();       // ⬅️ await
+  const userId = await getCurrentUserId(); // ⬅️ await
   if (!userId) {
     redirect("/auth");
   }
@@ -26,7 +26,7 @@ export default async function GettingStartedGuardLayout({
   });
 
   if (exists) {
-    redirect("/dashboard");                      // o `/dashboard/${exists.id}`
+    redirect("/dashboard"); // o `/dashboard/${exists.id}`
   }
 
   /* 3 · Mostrar wizard porque aún no tiene Brand */

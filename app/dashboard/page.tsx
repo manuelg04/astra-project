@@ -1,24 +1,82 @@
-// app/dashboard/page.tsx
+/* ------------------------------------------------------------------
+   app/dashboard/page.tsx
+------------------------------------------------------------------ */
 "use client";
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { LogOut } from "lucide-react";
+import { LogOut, Building2, BookOpen } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import { getUserProfile, logout, UserProfile } from "@/lib/auth";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 
+import { getUserProfile, logout, UserProfile, getAuthToken } from "@/lib/auth";
+
+/* ──────────────────────────────────────────────────────────── */
+/*  Tipos – coinciden con la respuesta de /api/brands/tree     */
+/* ──────────────────────────────────────────────────────────── */
+interface CourseSpaceSummary {
+  id: string;
+  title: string;
+  description: string | null;
+  createdAt: string;
+  updatedAt: string;
+  coursesCount: number;
+}
+
+interface SpaceGroupSummary {
+  id: string;
+  name: string;
+  logoUrl: string | null;
+  pricingType: "FREE" | "PAID";
+  price: string;
+  courseSpaces: CourseSpaceSummary[];
+}
+
+interface BrandSummary {
+  id: string;
+  name: string;
+  logoUrl: string | null;
+  spaceGroups: SpaceGroupSummary[];
+}
+
+/* ──────────────────────────────────────────────────────────── */
+/*  Componente                                                 */
+/* ──────────────────────────────────────────────────────────── */
 export default function DashboardPage() {
   const router = useRouter();
+
   const [user, setUser] = useState<UserProfile | null>(null);
+  const [brands, setBrands] = useState<BrandSummary[]>([]);
   const [loading, setLoading] = useState(true);
 
+  /* 1 · Cargar perfil + brands ------------------------------------- */
   useEffect(() => {
     (async () => {
       try {
+        /* Perfil ---------------------------------------------------- */
         const profile = await getUserProfile();
-        if (profile) setUser(profile);
-        else router.push("/auth");
+        if (!profile) {
+          router.push("/auth");
+          return;
+        }
+        setUser(profile);
+
+        /* Brands / SpaceGroups -------------------------------------- */
+        const token = getAuthToken();
+        if (!token) {
+          router.push("/auth");
+          return;
+        }
+
+        const res = await fetch("/api/brands/tree", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        console.log(res);
+        if (!res.ok) throw new Error("Unable to fetch brands");
+
+        const data = (await res.json()) as { brands: BrandSummary[] };
+        setBrands(data.brands);
       } catch {
         router.push("/auth");
       } finally {
@@ -27,14 +85,15 @@ export default function DashboardPage() {
     })();
   }, [router]);
 
-  const handleLogout = async () => {
+  /* 2 · Logout ----------------------------------------------------- */
+  const handleLogout = () => {
     logout();
     router.push("/auth");
   };
 
+  /* 3 · Loading ---------------------------------------------------- */
   if (loading) {
     return (
-      // El layout ya provee un fondo, ajusta si es necesario
       <div className="flex items-center justify-center h-full">
         <div className="text-center">
           <div className="w-16 h-16 border-4 border-purple-600 border-t-transparent rounded-full animate-spin mx-auto" />
@@ -46,14 +105,15 @@ export default function DashboardPage() {
     );
   }
 
-  // El layout ya proporciona padding (p-6), así que no necesitamos contenedores extra aquí a menos que sea específico para esta página.
+  /* 4 · UI --------------------------------------------------------- */
   return (
     <div>
-      {/* Header simple dentro del contenido principal si aún lo deseas */}
+      {/* Header ----------------------------------------------------- */}
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
           Dashboard Overview
         </h1>
+
         <Button
           onClick={handleLogout}
           variant="outline"
@@ -64,25 +124,23 @@ export default function DashboardPage() {
         </Button>
       </div>
 
-      {/* Contenido principal de la página */}
-      <div className="bg-white dark:bg-gray-800 shadow-xl rounded-2xl p-8">
-        <div className="text-center">
-          <h2 className="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-indigo-600">
-            Welcome to Your Dashboard!
-          </h2>
-          <p className="mt-4 text-xl text-gray-600 dark:text-gray-400">
-            You've successfully authenticated and reached the dashboard.
-          </p>
-          {user && (
-            <div className="mt-8 p-6 bg-gradient-to-r from-purple-50 to-indigo-50 dark:from-purple-900/50 dark:to-indigo-900/50 rounded-xl">
-              <p className="text-lg font-medium text-gray-800 dark:text-gray-200">
-                Logged in as: <span className="font-bold">{user.fullName}</span>
-              </p>
-              <p className="text-gray-600 dark:text-gray-400">{user.email}</p>
-            </div>
-          )}
-        </div>
-      </div>
+      {/* Perfil ----------------------------------------------------- */}
+      {user && (
+        <Card className="mb-8">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Building2 className="h-5 w-5 text-purple-600" />
+              Bienvenido, {user.fullName || user.email}
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-gray-600 dark:text-gray-400">{user.email}</p>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Brands ----------------------------------------------------- */}
+
     </div>
   );
 }
