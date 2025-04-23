@@ -1,3 +1,5 @@
+// app/dashboard/[brandId]/[spaceGroupId]/[courseSpaceId]/page.tsx
+
 import { prisma } from "@/lib/db";
 
 interface Params {
@@ -7,19 +9,16 @@ interface Params {
 }
 
 export default async function CourseSpacePage({ params }: { params: Params }) {
-  const [brandId, spaceGroupId, courseSpaceId] = await Promise.all([
-    params.brandId,
-    params.spaceGroupId,
-    params.courseSpaceId,
-  ]);
+  // 1 · Desestructuramos params de forma asíncrona
+  const { brandId, spaceGroupId, courseSpaceId } = await params;
 
-  /* 1 · Query mínima de validación — comprueba pertenencia en cadena */
+  // 2 · Query mínima de validación — comprueba jerarquía correcta
   const courseSpace = await prisma.courseSpace.findFirst({
     where: {
       id: courseSpaceId,
       spaceGroup: {
         id: spaceGroupId,
-        brandId, // asegura jerarquía correcta
+        brandId,
       },
     },
     include: {
@@ -27,6 +26,7 @@ export default async function CourseSpacePage({ params }: { params: Params }) {
     },
   });
 
+  // 3 · Si no existe, renderizamos un fallback
   if (!courseSpace) {
     return (
       <div className="p-6">
@@ -36,17 +36,14 @@ export default async function CourseSpacePage({ params }: { params: Params }) {
     );
   }
 
-  /* 2 · Render */
+  // 4 · Render principal
   return (
     <div className="p-6">
       <h1 className="text-2xl font-bold mb-4">{courseSpace.title}</h1>
-
       <p className="text-gray-600">
         {courseSpace._count.courses} curso
         {courseSpace._count.courses === 1 ? "" : "s"} en este espacio.
       </p>
-
-      {/* Placeholder: aquí listarás los cursos */}
       <div className="mt-6 border rounded-lg p-6 text-gray-500">
         Todavía no has añadido cursos.
         <br />
