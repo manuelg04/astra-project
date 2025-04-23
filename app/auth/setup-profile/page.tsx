@@ -33,17 +33,26 @@ export default function SetupProfilePage() {
     setIsLoading(true);
 
     try {
-      if (!avatarFile) {
-        setErrors("Profile picture is required");
-        setIsLoading(false);
-        return;
+      let avatarUrl: string | undefined = undefined;
+      if (avatarFile) {
+        try {
+          avatarUrl = await fileToBase64(avatarFile);
+        } catch (error) {
+          console.error("Error converting file to base64:", error);
+          setErrors("Error processing profile picture. Try again.");
+          setIsLoading(false);
+          return;
+        }
       }
 
-      const avatarUrl = await fileToBase64(avatarFile);
-      const ok = await setupUserProfile(fullName, phone, avatarUrl);
-      if (ok) router.push("/dashboard");
-      else setErrors("Unable to save profile. Try again.");
-    } catch {
+      const ok = await setupUserProfile(fullName, phone, avatarUrl ?? "");
+      if (ok) {
+        router.push("/dashboard");
+      } else {
+        setErrors("Unable to save profile. Try again.");
+      }
+    } catch (error) {
+      console.error("Error setting up profile:", error);
       setErrors("Something went wrong. Try again.");
     } finally {
       setIsLoading(false);
@@ -61,20 +70,20 @@ export default function SetupProfilePage() {
             Set up your profile
           </h2>
           <p className="mt-2 text-sm text-gray-600">
-            All fields are required to continue
+            Complete your profile to continue (profile picture is optional)
           </p>
         </div>
 
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           <div className="space-y-2">
             <Label htmlFor="avatar" className="text-sm font-medium text-gray-700">
-              Profile picture
+              Profile picture (Optional)
             </Label>
             <Input
               id="avatar"
               type="file"
               accept="image/*"
-              required
+              // removed required attribute
               onChange={(e) => setAvatarFile(e.target.files?.[0] || null)}
             />
           </div>

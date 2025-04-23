@@ -107,7 +107,7 @@ export async function getUserProfile(): Promise<UserProfile | null> {
   return {
     email: user.email,
     fullName: user.name ?? "",
-    profilePicture: user.avatarUrl,
+    profilePicture: user.avatarUrl ?? null,
   };
 }
 
