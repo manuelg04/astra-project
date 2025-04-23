@@ -24,6 +24,7 @@ import {
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"; // Import RadioGroup
 import { useRouter } from "next/navigation";
 import { getAuthToken } from "@/lib/auth";
+import { useToast } from "@/components/ui/use-toast";
 
 const formatCOP = (value: number | null | undefined): string => {
   if (value === null || value === undefined || isNaN(value)) return "";
@@ -45,6 +46,7 @@ const parseCOP = (formatted: string): number | null => {
 /* ──────────────────────────────────────────────────────────── */
 export default function GettingStartedPage() {
   const router = useRouter();
+  const { toast } = useToast();
 
   /* ───────────── Estado del formulario ───────────── */
   const [brandName, setBrandName] = useState("");
@@ -117,7 +119,11 @@ export default function GettingStartedPage() {
       /** JWT desde cookie o localStorage */
       const token = getAuthToken();
       if (!token) {
-        alert("Debes iniciar sesión otra vez.");
+        toast({
+          title: "Error de autenticación",
+          description: "Debes iniciar sesión otra vez.",
+          variant: "destructive",
+        });
         router.push("/auth");
         return;
       }
@@ -131,13 +137,19 @@ export default function GettingStartedPage() {
       const json = await res.json();
       if (!res.ok) throw new Error(json.error ?? "Error inesperado");
 
-      alert("¡Comunidad creada con éxito!");
+      toast({
+        title: "¡Éxito!",
+        description: "Comunidad creada con éxito.",
+        variant: "default",
+      });
       router.push("/dashboard"); // o `/dashboard/${json.brand.id}`
     } catch (err) {
       console.error(err);
-      alert(
-        err instanceof Error ? err.message : "No se pudo crear la comunidad",
-      );
+      toast({
+        title: "Error",
+        description: err instanceof Error ? err.message : "No se pudo crear la comunidad",
+        variant: "destructive",
+      });
     } finally {
       setSubmitting(false);
     }
