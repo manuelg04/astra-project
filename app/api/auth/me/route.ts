@@ -15,7 +15,7 @@ export async function GET(req: Request) {
 
     const user = await prisma.user.findUnique({
       where: { id: userId },
-      select: { email: true, name: true, avatarUrl: true },
+      select: { id: true, email: true, name: true, avatarUrl: true },
     });
 
     if (!user) {
@@ -25,6 +25,7 @@ export async function GET(req: Request) {
     return NextResponse.json(
       {
         user: {
+          id: user.id,
           email: user.email,
           name: user.name ?? "",
           avatarUrl: user.avatarUrl ?? null,

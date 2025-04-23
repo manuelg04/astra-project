@@ -86,6 +86,7 @@ export async function setupUserProfile(
 }
 
 export interface UserProfile {
+  id: string;
   email: string;
   fullName: string;
   profilePicture: string | null;
@@ -101,10 +102,11 @@ export async function getUserProfile(): Promise<UserProfile | null> {
   if (!res.ok) return null;
 
   const { user } = (await res.json()) as {
-    user: { email: string; name: string | null; avatarUrl: string | null };
+    user: { id: string; email: string; name: string | null; avatarUrl: string | null };
   };
 
   return {
+    id: user.id,
     email: user.email,
     fullName: user.name ?? "",
     profilePicture: user.avatarUrl ?? null,
