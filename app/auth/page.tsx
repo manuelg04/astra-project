@@ -34,7 +34,7 @@ export default function AuthPage() {
         router.push(`/auth/register?email=${encodeURIComponent(email)}`)
       }
     } catch (err) {
-      setError("Something went wrong. Please try again.")
+      setError("Algo salió mal. Por favor, inténtalo de nuevo.")
     } finally {
       setIsLoading(false)
     }
@@ -60,21 +60,21 @@ export default function AuthPage() {
               <path d="M12 9v6" />
             </svg>
           </div>
-          <h2 className="mt-6 text-3xl font-extrabold text-gray-900">Welcome!</h2>
-          <p className="mt-2 text-sm text-gray-600">Enter your email to get started</p>
+          <h2 className="mt-6 text-3xl font-extrabold text-gray-900">¡Bienvenido!</h2>
+          <p className="mt-2 text-sm text-gray-600">Ingresa tu correo electrónico para comenzar</p>
         </div>
 
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           <div className="space-y-2">
             <Label htmlFor="email" className="text-sm font-medium text-gray-700">
-              Email address
+              Dirección de correo electrónico
             </Label>
             <Input
               id="email"
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="you@example.com"
+              placeholder="tu@ejemplo.com"
               required
               className="h-12 px-4 border-gray-300 focus:ring-purple-500 focus:border-purple-500"
             />
@@ -90,7 +90,7 @@ export default function AuthPage() {
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
             ) : (
               <>
-                Continue <ArrowRight className="ml-2 h-4 w-4" />
+                Continuar <ArrowRight className="ml-2 h-4 w-4" />
               </>
             )}
           </Button>

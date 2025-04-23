@@ -27,9 +27,9 @@ export default function LoginPage() {
     try {
       const success = await loginUser(email, password);
       if (success) router.push("/dashboard");
-      else setError("Invalid password. Please try again.");
+      else setError("Contraseña inválida. Por favor, inténtalo de nuevo.");
     } catch {
-      setError("Something went wrong. Please try again.");
+      setError("Algo salió mal. Por favor, inténtalo de nuevo.");
     } finally {
       setIsLoading(false);
     }
@@ -43,17 +43,17 @@ export default function LoginPage() {
             <Lock className="w-8 h-8 text-white" />
           </div>
           <h2 className="mt-6 text-3xl font-extrabold text-gray-900">
-            Welcome back!
+            ¡Bienvenido de nuevo!
           </h2>
           <p className="mt-2 text-sm text-gray-600">
-            Enter your password to continue
+            Ingresa tu contraseña para continuar
           </p>
         </div>
 
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           <div className="space-y-2">
             <Label htmlFor="email" className="text-sm font-medium text-gray-700">
-              Email address
+              Dirección de correo electrónico
             </Label>
             <Input
               id="email"
@@ -69,14 +69,14 @@ export default function LoginPage() {
               htmlFor="password"
               className="text-sm font-medium text-gray-700"
             >
-              Password
+              Contraseña
             </Label>
             <Input
               id="password"
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder="Enter your password"
+              placeholder="Ingresa tu contraseña"
               required
               className="h-12 px-4 border-gray-300 focus:ring-purple-500 focus:border-purple-500"
             />
@@ -92,7 +92,7 @@ export default function LoginPage() {
               {isLoading ? (
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
               ) : (
-                "Sign in"
+                "Iniciar sesión"
               )}
             </Button>
 
@@ -103,7 +103,7 @@ export default function LoginPage() {
               className="flex items-center justify-center text-gray-600"
             >
               <ArrowLeft className="mr-2 h-4 w-4" />
-              Back to email
+              Volver al correo
             </Button>
           </div>
         </form>

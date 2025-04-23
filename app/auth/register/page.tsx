@@ -25,8 +25,8 @@ export default function RegisterPage() {
   const validatePasswords = () => {
     const newErrors: { password?: string; confirm?: string } = {};
 
-    if (password.length < 8) newErrors.password = "Password must be at least 8 characters";
-    if (password !== confirmPassword) newErrors.confirm = "Passwords do not match";
+    if (password.length < 8) newErrors.password = "La contraseña debe tener al menos 8 caracteres";
+    if (password !== confirmPassword) newErrors.confirm = "Las contraseñas no coinciden";
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -40,9 +40,9 @@ export default function RegisterPage() {
     try {
       const success = await registerUser(email, password);
       if (success) router.push("/auth/setup-profile");
-      else setErrors({ password: "Registration failed. Please try again." });
+      else setErrors({ password: "Registro fallido. Por favor, inténtalo de nuevo." });
     } catch {
-      setErrors({ password: "Something went wrong. Please try again." });
+      setErrors({ password: "Algo salió mal. Por favor, inténtalo de nuevo." });
     } finally {
       setIsLoading(false);
     }
@@ -56,17 +56,17 @@ export default function RegisterPage() {
             <UserPlus className="w-8 h-8 text-white" />
           </div>
           <h2 className="mt-6 text-3xl font-extrabold text-gray-900">
-            Create account
+            Crear cuenta
           </h2>
           <p className="mt-2 text-sm text-gray-600">
-            Set up a password for your new account
+            Configura una contraseña para tu nueva cuenta
           </p>
         </div>
 
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           <div className="space-y-2">
             <Label htmlFor="email" className="text-sm font-medium text-gray-700">
-              Email address
+              Dirección de correo electrónico
             </Label>
             <Input
               id="email"
@@ -82,14 +82,14 @@ export default function RegisterPage() {
               htmlFor="password"
               className="text-sm font-medium text-gray-700"
             >
-              Password
+              Contraseña
             </Label>
             <Input
               id="password"
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder="Create a password"
+              placeholder="Crea una contraseña"
               required
               className="h-12 px-4 border-gray-300 focus:ring-purple-500 focus:border-purple-500"
             />
@@ -103,14 +103,14 @@ export default function RegisterPage() {
               htmlFor="confirmPassword"
               className="text-sm font-medium text-gray-700"
             >
-              Confirm Password
+              Confirmar contraseña
             </Label>
             <Input
               id="confirmPassword"
               type="password"
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
-              placeholder="Confirm your password"
+              placeholder="Confirma tu contraseña"
               required
               className="h-12 px-4 border-gray-300 focus:ring-purple-500 focus:border-purple-500"
             />
@@ -129,7 +129,7 @@ export default function RegisterPage() {
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
               ) : (
                 <>
-                  Continue <ArrowRight className="ml-2 h-4 w-4" />
+                  Continuar <ArrowRight className="ml-2 h-4 w-4" />
                 </>
               )}
             </Button>
@@ -141,7 +141,7 @@ export default function RegisterPage() {
               className="flex items-center justify-center text-gray-600"
             >
               <ArrowLeft className="mr-2 h-4 w-4" />
-              Back to email
+              Volver al correo
             </Button>
           </div>
         </form>
