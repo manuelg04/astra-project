@@ -22,6 +22,7 @@ import { Button } from "@/components/ui/button";
 
 import { getUserProfile, getAuthToken, UserProfile } from "@/lib/auth";
 import EditSpaceGroupDialog from "./space-groups/EditSpaceGroupDialog";
+import ThemeToggle from "./ThemeToggle";
 
 /* --- tipos idénticos al endpoint /api/brands/tree ---------------- */
 interface CourseSpaceSummary {
@@ -208,6 +209,7 @@ export default function Sidebar() {
           }}
         />
       </div>
+      <ThemeToggle />
 
       {/* Sección 3: User Info */}
       {user && (
