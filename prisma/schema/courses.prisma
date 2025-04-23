@@ -1,0 +1,67 @@
+model CourseSpace {
+  id           String     @id @default(cuid())
+  title        String
+  description  String?
+  spaceGroupId String
+  spaceGroup   SpaceGroup @relation(fields: [spaceGroupId], references: [id], onDelete: Cascade)
+
+  // Relación 1-N: un CourseSpace posee múltiples Courses
+  courses Course[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([spaceGroupId])
+  @@map("course_spaces")
+}
+
+model Course {
+  id            String      @id @default(cuid())
+  name          String
+  description   String?
+  courseSpaceId String
+  courseSpace   CourseSpace @relation(fields: [courseSpaceId], references: [id], onDelete: Cascade)
+
+  // Relación 1-N: un Course tiene varios CourseChapters
+  chapters CourseChapter[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([courseSpaceId])
+  @@map("courses")
+}
+
+model CourseChapter {
+  id          String  @id @default(cuid())
+  title       String
+  description String?
+  position    Int?
+  courseId    String
+  course      Course  @relation(fields: [courseId], references: [id], onDelete: Cascade)
+
+  // Relación 1-N: un CourseChapter contiene muchos CourseLessons
+  lessons CourseLesson[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([courseId])
+  @@map("course_chapters")
+}
+
+model CourseLesson {
+  id          String        @id @default(cuid())
+  title       String
+  description String?
+  contentUrl  String?
+  position    Int?
+  chapterId   String
+  chapter     CourseChapter @relation(fields: [chapterId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([chapterId])
+  @@map("course_lessons")
+}

@@ -97,7 +97,6 @@ export async function uploadBuffer(
       Key: key,
       Body: buffer,
       ContentType: mimeType,
-      ACL: "public-read",
     }),
   );
 

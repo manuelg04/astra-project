@@ -1,0 +1,24 @@
+model SpaceGroup {
+  id           String        @id @default(cuid())
+  name         String
+  description  String?
+  logoUrl      String?
+  color        String?
+  emoji        String?
+  pricingType  PricingType   @default(FREE)
+  isPublic     Boolean       @default(false)
+  price        Decimal       @db.Decimal(10, 2)
+  brandId      String
+  brand        Brand         @relation(fields: [brandId], references: [id], onDelete: Cascade)
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  courseSpaces CourseSpace[]
+
+  @@index([brandId])
+  @@map("space_groups")
+}
+
+enum PricingType {
+  FREE
+  PAID
+}

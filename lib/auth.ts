@@ -113,6 +113,24 @@ export async function getUserProfile(): Promise<UserProfile | null> {
   };
 }
 
+export function getAuthToken(): string | null {
+  // 1 · Cookie accesible por JS
+  const cookieMatch = typeof document !== "undefined"
+    ? document.cookie
+        .split("; ")
+        .find((row) => row.startsWith("token="))
+        ?.split("=")[1]
+    : null;
+  if (cookieMatch) return decodeURIComponent(cookieMatch);
+
+  // 2 · Fallback localStorage (si decides duplicarlo allí)
+  if (typeof window !== "undefined") {
+    return localStorage.getItem("authToken");
+  }
+
+  return null;
+}
+
 export function logout(): void {
   deleteCookie(TOKEN_COOKIE);
 }
