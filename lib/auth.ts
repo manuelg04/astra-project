@@ -102,7 +102,12 @@ export async function getUserProfile(): Promise<UserProfile | null> {
   if (!res.ok) return null;
 
   const { user } = (await res.json()) as {
-    user: { id: string; email: string; name: string | null; avatarUrl: string | null };
+    user: {
+      id: string;
+      email: string;
+      name: string | null;
+      avatarUrl: string | null;
+    };
   };
 
   return {
@@ -115,12 +120,13 @@ export async function getUserProfile(): Promise<UserProfile | null> {
 
 export function getAuthToken(): string | null {
   // 1 · Cookie accesible por JS
-  const cookieMatch = typeof document !== "undefined"
-    ? document.cookie
-        .split("; ")
-        .find((row) => row.startsWith("token="))
-        ?.split("=")[1]
-    : null;
+  const cookieMatch =
+    typeof document !== "undefined"
+      ? document.cookie
+          .split("; ")
+          .find((row) => row.startsWith("token="))
+          ?.split("=")[1]
+      : null;
   if (cookieMatch) return decodeURIComponent(cookieMatch);
 
   // 2 · Fallback localStorage (si decides duplicarlo allí)

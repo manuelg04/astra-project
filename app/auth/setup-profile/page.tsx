@@ -76,7 +76,10 @@ export default function SetupProfilePage() {
 
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           <div className="space-y-2">
-            <Label htmlFor="avatar" className="text-sm font-medium text-gray-700">
+            <Label
+              htmlFor="avatar"
+              className="text-sm font-medium text-gray-700"
+            >
               Profile picture (Optional)
             </Label>
             <Input
@@ -104,7 +107,10 @@ export default function SetupProfilePage() {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="phone" className="text-sm font-medium text-gray-700">
+            <Label
+              htmlFor="phone"
+              className="text-sm font-medium text-gray-700"
+            >
               Phone number
             </Label>
             <Input

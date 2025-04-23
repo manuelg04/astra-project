@@ -66,13 +66,14 @@ export default function GettingStartedPage() {
     pricingType === "FREE" ||
     (pricingType === "PAID" && priceValue !== null && priceValue > 0);
 
-  const stepsCompleted =
-    (brandName ? 1 : 0) + (isPriceStepComplete ? 1 : 0) + (contentType ? 1 : 0);
+  const step1Done = !!brandName && isPriceStepComplete;
 
-  const totalSteps = 3;
+  // 2 · Paso 2 se completa cuando eliges un tipo de contenido
+  const step2Done = !!contentType;
+
+  const stepsCompleted = (step1Done ? 1 : 0) + (step2Done ? 1 : 0);
+  const totalSteps = 2;
   const progress = Math.round((stepsCompleted / totalSteps) * 100);
-
-  const token = getAuthToken();
 
   /* ───────────── Manejadores ───────────── */
   function handleLogo(e: ChangeEvent<HTMLInputElement>) {
@@ -103,42 +104,45 @@ export default function GettingStartedPage() {
 
   /* ───────────── Submit ───────────── */
   async function handleSubmit(e: FormEvent) {
-    e.preventDefault()
-    if (!brandName || !contentType || !isPriceStepComplete) return
+    e.preventDefault();
+    if (!brandName || !contentType || !isPriceStepComplete) return;
 
-    setSubmitting(true)
+    setSubmitting(true);
     try {
-      const fd = new FormData()
-      fd.append("name", brandName)
-      if (logo) fd.append("logo", logo)
-      fd.append("pricingType", pricingType)
-      if (pricingType === "PAID" && priceValue) fd.append("price", `${priceValue}`)
-      fd.append("contentType", contentType)
+      const fd = new FormData();
+      fd.append("name", brandName);
+      if (logo) fd.append("logo", logo);
+      fd.append("pricingType", pricingType);
+      if (pricingType === "PAID" && priceValue)
+        fd.append("price", `${priceValue}`);
+      fd.append("contentType", contentType);
 
       /** JWT desde cookie o localStorage */
-      const token = getAuthToken()
+      const token = getAuthToken();
       if (!token) {
-        alert("Debes iniciar sesión otra vez.")
-        router.push("/auth")
-        return
+        alert("Debes iniciar sesión otra vez.");
+        router.push("/auth");
+        return;
       }
 
       const res = await fetch("/api/brands", {
         method: "POST",
         headers: { Authorization: `Bearer ${token}` },
         body: fd,
-      })
+      });
 
-      const json = await res.json()
-      if (!res.ok) throw new Error(json.error ?? "Error inesperado")
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.error ?? "Error inesperado");
 
-      alert("¡Comunidad creada con éxito!")
-      router.push("/dashboard")          // o `/dashboard/${json.brand.id}`
+      alert("¡Comunidad creada con éxito!");
+      router.push("/dashboard"); // o `/dashboard/${json.brand.id}`
     } catch (err) {
-      console.error(err)
-      alert(err instanceof Error ? err.message : "No se pudo crear la comunidad")
+      console.error(err);
+      alert(
+        err instanceof Error ? err.message : "No se pudo crear la comunidad",
+      );
     } finally {
-      setSubmitting(false)
+      setSubmitting(false);
     }
   }
 

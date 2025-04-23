@@ -1,44 +1,44 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import { useState } from "react"
-import { useRouter } from "next/navigation"
-import { ArrowRight, Loader2 } from "lucide-react"
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { ArrowRight, Loader2 } from "lucide-react";
 
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { checkEmailExists } from "@/lib/auth"
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { checkEmailExists } from "@/lib/auth";
 
 export default function AuthPage() {
-  const router = useRouter()
-  const [email, setEmail] = useState("")
-  const [error, setError] = useState("")
-  const [isLoading, setIsLoading] = useState(false)
+  const router = useRouter();
+  const [email, setEmail] = useState("");
+  const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setError("")
-    setIsLoading(true)
+    e.preventDefault();
+    setError("");
+    setIsLoading(true);
 
     try {
       // Check if email exists in the system
-      const emailExists = await checkEmailExists(email)
+      const emailExists = await checkEmailExists(email);
 
       if (emailExists) {
         // Redirect to login page if email exists
-        router.push(`/auth/login?email=${encodeURIComponent(email)}`)
+        router.push(`/auth/login?email=${encodeURIComponent(email)}`);
       } else {
         // Redirect to registration page if email doesn't exist
-        router.push(`/auth/register?email=${encodeURIComponent(email)}`)
+        router.push(`/auth/register?email=${encodeURIComponent(email)}`);
       }
     } catch (err) {
-      setError("Algo salió mal. Por favor, inténtalo de nuevo.")
+      setError("Algo salió mal. Por favor, inténtalo de nuevo.");
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-50 to-indigo-50">
@@ -60,13 +60,20 @@ export default function AuthPage() {
               <path d="M12 9v6" />
             </svg>
           </div>
-          <h2 className="mt-6 text-3xl font-extrabold text-gray-900">¡Bienvenido!</h2>
-          <p className="mt-2 text-sm text-gray-600">Ingresa tu correo electrónico para comenzar</p>
+          <h2 className="mt-6 text-3xl font-extrabold text-gray-900">
+            ¡Bienvenido!
+          </h2>
+          <p className="mt-2 text-sm text-gray-600">
+            Ingresa tu correo electrónico para comenzar
+          </p>
         </div>
 
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           <div className="space-y-2">
-            <Label htmlFor="email" className="text-sm font-medium text-gray-700">
+            <Label
+              htmlFor="email"
+              className="text-sm font-medium text-gray-700"
+            >
               Dirección de correo electrónico
             </Label>
             <Input
@@ -97,5 +104,5 @@ export default function AuthPage() {
         </form>
       </div>
     </div>
-  )
+  );
 }

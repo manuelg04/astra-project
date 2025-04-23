@@ -10,10 +10,7 @@ export async function POST(req: Request) {
 
   const user = await prisma.user.findUnique({ where: { email } });
   if (!user || !(await verifyPassword(password, user.password))) {
-    return NextResponse.json(
-      { error: "Invalid credentials" },
-      { status: 401 },
-    );
+    return NextResponse.json({ error: "Invalid credentials" }, { status: 401 });
   }
 
   const token = signJWT({ sub: user.id, email: user.email });

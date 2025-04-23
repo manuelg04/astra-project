@@ -38,7 +38,9 @@ export default function DashboardPage() {
       <div className="flex items-center justify-center h-full">
         <div className="text-center">
           <div className="w-16 h-16 border-4 border-purple-600 border-t-transparent rounded-full animate-spin mx-auto" />
-          <p className="mt-4 text-lg text-gray-700 dark:text-gray-300">Loading dashboard...</p>
+          <p className="mt-4 text-lg text-gray-700 dark:text-gray-300">
+            Loading dashboard...
+          </p>
         </div>
       </div>
     );
@@ -47,20 +49,20 @@ export default function DashboardPage() {
   // El layout ya proporciona padding (p-6), así que no necesitamos contenedores extra aquí a menos que sea específico para esta página.
   return (
     <div>
-       {/* Header simple dentro del contenido principal si aún lo deseas */}
-       <div className="flex items-center justify-between mb-6">
-         <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
-           Dashboard Overview
-         </h1>
-         <Button
-           onClick={handleLogout}
-           variant="outline"
-           className="flex items-center gap-2"
-         >
-           <LogOut className="w-4 h-4" />
-           Sign out
-         </Button>
-       </div>
+      {/* Header simple dentro del contenido principal si aún lo deseas */}
+      <div className="flex items-center justify-between mb-6">
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+          Dashboard Overview
+        </h1>
+        <Button
+          onClick={handleLogout}
+          variant="outline"
+          className="flex items-center gap-2"
+        >
+          <LogOut className="w-4 h-4" />
+          Sign out
+        </Button>
+      </div>
 
       {/* Contenido principal de la página */}
       <div className="bg-white dark:bg-gray-800 shadow-xl rounded-2xl p-8">

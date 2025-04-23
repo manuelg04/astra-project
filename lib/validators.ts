@@ -24,12 +24,10 @@ export const setupProfileSchema = z.object({
     .string()
     .optional()
     .refine(
-      (v) =>
-        !v || v.startsWith("http") || dataUrlRegex.test(v),
+      (v) => !v || v.startsWith("http") || dataUrlRegex.test(v),
       "Invalid avatar format",
     ),
 });
-
 
 export const createBrandSchema = z.object({
   name: z.string().min(2, "Name is required"),

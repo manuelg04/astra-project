@@ -56,7 +56,8 @@ const mockUser = {
 //   user: UserProfile | null; // Descomenta si pasas el usuario como prop
 // }
 
-export default function Sidebar(/* { user } */) { // Descomenta si pasas el usuario como prop
+export default function Sidebar(/* { user } */) {
+  // Descomenta si pasas el usuario como prop
   const [selectedBrand, setSelectedBrand] = useState(brands[0].id);
   const user = mockUser; // Usando mock data por ahora
 
@@ -92,16 +93,22 @@ export default function Sidebar(/* { user } */) { // Descomenta si pasas el usua
                   <span>{group.name}</span>
                 </div>
                 {/* Icono de tuerca (aparece al hacer hover en el trigger) */}
-                 <Button variant="ghost" size="icon" className="h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <Settings className="h-4 w-4" />
-                 </Button>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity"
+                >
+                  <Settings className="h-4 w-4" />
+                </Button>
               </AccordionTrigger>
               <AccordionContent>
                 <ul className="space-y-1 pl-4">
                   {group.contentTypes.map((contentType) => (
                     <li key={contentType.id}>
                       {/* Enlace para navegar a la página específica */}
-                      <Link href={`/dashboard/${selectedBrand}/${group.id}/${contentType.id}`}>
+                      <Link
+                        href={`/dashboard/${selectedBrand}/${group.id}/${contentType.id}`}
+                      >
                         <Button
                           variant="ghost"
                           className="w-full justify-start text-sm font-normal h-8 px-2"

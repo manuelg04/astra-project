@@ -21,7 +21,7 @@ export async function POST(req: Request) {
 
   /* 2 · Validar payload con Zod ------------------------------------ */
   const body = await req.json();
-  const data = setupProfileSchema.parse(body);          // name, phone, avatarUrl?
+  const data = setupProfileSchema.parse(body); // name, phone, avatarUrl?
 
   /* 3 · Si viene avatar en data-URL, súbelo a S3 ------------------- */
   let finalAvatarUrl: string | null = null;

@@ -7,7 +7,5 @@ export default function SpaceGroupLayout({
   params: { brandId: string; groupId: string };
   children: ReactNode;
 }) {
-  return (
-    <div className="flex-1">{children}</div>
-  );
+  return <div className="flex-1">{children}</div>;
 }

@@ -25,8 +25,10 @@ export default function RegisterPage() {
   const validatePasswords = () => {
     const newErrors: { password?: string; confirm?: string } = {};
 
-    if (password.length < 8) newErrors.password = "La contraseña debe tener al menos 8 caracteres";
-    if (password !== confirmPassword) newErrors.confirm = "Las contraseñas no coinciden";
+    if (password.length < 8)
+      newErrors.password = "La contraseña debe tener al menos 8 caracteres";
+    if (password !== confirmPassword)
+      newErrors.confirm = "Las contraseñas no coinciden";
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -40,7 +42,10 @@ export default function RegisterPage() {
     try {
       const success = await registerUser(email, password);
       if (success) router.push("/auth/setup-profile");
-      else setErrors({ password: "Registro fallido. Por favor, inténtalo de nuevo." });
+      else
+        setErrors({
+          password: "Registro fallido. Por favor, inténtalo de nuevo.",
+        });
     } catch {
       setErrors({ password: "Algo salió mal. Por favor, inténtalo de nuevo." });
     } finally {
@@ -65,7 +70,10 @@ export default function RegisterPage() {
 
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           <div className="space-y-2">
-            <Label htmlFor="email" className="text-sm font-medium text-gray-700">
+            <Label
+              htmlFor="email"
+              className="text-sm font-medium text-gray-700"
+            >
               Dirección de correo electrónico
             </Label>
             <Input

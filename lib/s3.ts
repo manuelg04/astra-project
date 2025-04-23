@@ -1,14 +1,15 @@
 import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
 import { randomUUID } from "node:crypto";
 
-const {
-  AWS_REGION,
-  AWS_S3_BUCKET,
-  AWS_ACCESS_KEY_ID,
-  AWS_SECRET_ACCESS_KEY,
-} = process.env;
+const { AWS_REGION, AWS_S3_BUCKET, AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY } =
+  process.env;
 
-if (!AWS_REGION || !AWS_S3_BUCKET || !AWS_ACCESS_KEY_ID || !AWS_SECRET_ACCESS_KEY) {
+if (
+  !AWS_REGION ||
+  !AWS_S3_BUCKET ||
+  !AWS_ACCESS_KEY_ID ||
+  !AWS_SECRET_ACCESS_KEY
+) {
   throw new Error(
     "S3 – missing AWS credentials or bucket info in environment variables.",
   );
@@ -58,9 +59,9 @@ export async function uploadImageDataUrl(
   );
   if (!match) throw new Error("Invalid data URL");
 
-  const mimeType = match[1];        // ej. "image/png"
-  const base64   = match[2];
-  const buffer   = Buffer.from(base64, "base64");
+  const mimeType = match[1]; // ej. "image/png"
+  const base64 = match[2];
+  const buffer = Buffer.from(base64, "base64");
 
   /* 2 · Derivar extensión y key -------------------------------------- */
   const extension = mimeType.split("/")[1].replace("+xml", ""); // svg+xml -> svg
