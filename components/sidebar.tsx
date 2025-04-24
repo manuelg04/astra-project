@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { Building2, BookOpen, Settings } from "lucide-react";
+import { Plus, Settings, BookOpen } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -21,18 +21,19 @@ import { Button } from "@/components/ui/button";
 
 import { getUserProfile, UserProfile } from "@/lib/auth";
 import EditSpaceGroupDialog from "./space-groups/EditSpaceGroupDialog";
+import CreateSpaceDialog from "./CreateSpaceDialog";
 import ThemeToggle from "./ThemeToggle";
 import {
   BrandSummary,
   CourseSpaceSummary,
-  mutateBrandsTree,
   SpaceGroupSummary,
   useBrandsTree,
+  mutateBrandsTree,
 } from "@/hooks/useBrandsTree";
 
 /* ---------------------------------------------------------------- */
 export default function Sidebar() {
-  /* 1 · perfil del usuario ---------------------------------------- */
+  /* usuario -------------------------------------------------------- */
   const [user, setUser] = useState<UserProfile | null>(null);
   useEffect(() => {
     getUserProfile()
@@ -40,40 +41,39 @@ export default function Sidebar() {
       .catch(() => {});
   }, []);
 
-  /* 2 · brands vía SWR ------------------------------------------- */
+  /* tree ----------------------------------------------------------- */
   const { data, error, isLoading } = useBrandsTree();
   const brands: BrandSummary[] = data?.brands ?? [];
 
-  /* 3 · brand seleccionada --------------------------------------- */
+  /* brand seleccionada -------------------------------------------- */
   const [selectedBrand, setSelectedBrand] = useState<string | undefined>();
   useEffect(() => {
     if (!selectedBrand && brands.length) setSelectedBrand(brands[0].id);
   }, [brands, selectedBrand]);
 
-  /* 4 · modal edición -------------------------------------------- */
+  /* diálogos ------------------------------------------------------- */
   const [editing, setEditing] = useState<SpaceGroupSummary | null>(null);
+  const [creating, setCreating] = useState<SpaceGroupSummary | null>(null);
 
-  /* ----------------- estados de carga / error ------------------- */
-  if (isLoading) {
+  /* loading / error ------------------------------------------------ */
+  if (isLoading)
     return (
       <div className="w-64 h-full flex items-center justify-center border-r border-gray-200 dark:border-gray-700">
         <div className="w-6 h-6 border-4 border-purple-600 border-t-transparent rounded-full animate-spin" />
       </div>
     );
-  }
 
-  if (error) {
+  if (error)
     return (
       <div className="w-64 h-full flex items-center justify-center border-r border-gray-200 dark:border-gray-700">
         <p className="text-sm text-gray-500">Error al cargar comunidades</p>
       </div>
     );
-  }
 
-  /* --------------------------- UI ------------------------------- */
+  /* UI ------------------------------------------------------------- */
   return (
     <div className="w-64 h-full bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 flex flex-col">
-      {/* Selector de Brand ------------------------------------------------ */}
+      {/* brand selector --------------------------------------------- */}
       <div className="p-4 border-b border-gray-200 dark:border-gray-700">
         {brands.length === 0 ? (
           <p className="text-sm text-gray-500">Sin comunidades</p>
@@ -93,7 +93,7 @@ export default function Sidebar() {
         )}
       </div>
 
-      {/* Space Groups ---------------------------------------------------- */}
+      {/* space groups ------------------------------------------------ */}
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
         <h2 className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
           Space Groups
@@ -104,7 +104,7 @@ export default function Sidebar() {
         ) : (
           brands
             .find((b) => b.id === selectedBrand)!
-            .spaceGroups.map((group: SpaceGroupSummary) => (
+            .spaceGroups.map((group) => (
               <Accordion
                 key={group.id}
                 type="single"
@@ -117,24 +117,56 @@ export default function Sidebar() {
                       <span>{group.emoji ?? "🌐"}</span>
                       <span>{group.name}</span>
                     </div>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-6 w-6 z-10"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setEditing(group);
-                      }}
-                    >
-                      <Settings className="h-4 w-4" />
-                    </Button>
+                    <div className="flex items-center gap-1 z-10">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-6 w-6"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setCreating(group);
+                        }}
+                      >
+                        <Plus className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-6 w-6"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setEditing(group);
+                        }}
+                      >
+                        <Settings className="h-4 w-4" />
+                      </Button>
+                    </div>
                   </AccordionTrigger>
                   <AccordionContent>
                     <ul className="space-y-1 pl-4">
-                      {group.courseSpaces.map((cs: CourseSpaceSummary) => (
+                      {/* Post Spaces primero */}
+                      {group.postSpaces.map((ps) => (
+                        <li key={ps.id}>
+                          <Link
+                            href={`/dashboard/${selectedBrand}/${group.id}/post-spaces/${ps.id}/posts`}
+                          >
+                            <Button
+                              variant="ghost"
+                              className="w-full justify-start text-sm font-normal h-8 px-2"
+                            >
+                              <BookOpen className="mr-2 h-4 w-4 rotate-90" />{" "}
+                              {/* icono reutilizado */}
+                              {ps.name}
+                            </Button>
+                          </Link>
+                        </li>
+                      ))}
+
+                      {/* Course Spaces */}
+                      {group.courseSpaces.map((cs) => (
                         <li key={cs.id}>
                           <Link
-                            href={`/dashboard/${selectedBrand}/${group.id}/${cs.id}`}
+                            href={`/dashboard/${selectedBrand}/${group.id}/course-spaces/${cs.id}/courses`}
                           >
                             <Button
                               variant="ghost"
@@ -153,7 +185,7 @@ export default function Sidebar() {
             ))
         )}
 
-        {/* Modal edición ------------------------------------------- */}
+        {/* diálogo edición ---------------------------------------- */}
         <EditSpaceGroupDialog
           open={!!editing}
           group={
@@ -167,13 +199,12 @@ export default function Sidebar() {
               : null
           }
           onClose={() => setEditing(null)}
-          onSaved={() => mutateBrandsTree()} // refetch global
+          onSaved={() => mutateBrandsTree()}
         />
       </div>
 
+      {/* theme y usuario -------------------------------------------- */}
       <ThemeToggle />
-
-      {/* Info usuario --------------------------------------------------- */}
       {user && (
         <div className="p-4 border-t border-gray-200 dark:border-gray-700">
           <div className="flex items-center justify-between">
@@ -197,6 +228,15 @@ export default function Sidebar() {
           </div>
         </div>
       )}
+
+      {/* diálogo crear nuevo ---------------------------------------- */}
+      <CreateSpaceDialog
+        open={!!creating}
+        brandId={selectedBrand ?? ""}
+        group={creating}
+        onClose={() => setCreating(null)}
+        onCreated={() => mutateBrandsTree()}
+      />
     </div>
   );
 }

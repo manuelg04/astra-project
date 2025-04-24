@@ -8,7 +8,10 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   brands    Brand[]
-
+  posts     Post[]
+  postslikes PostLike[]
+  spaceGroupMembers SpaceGroupMember[]
+  brandMembers BrandMember[]
   @@index([phone])
   @@index([createdAt])
   @@map("users")

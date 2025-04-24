@@ -1,0 +1,78 @@
+model PostSpace {
+  id           String            @id @default(cuid())
+  name         String
+  description  String?
+  spaceGroupId String
+  spaceGroup   SpaceGroup        @relation(fields: [spaceGroupId], references: [id], onDelete: Cascade)
+
+  // Relaciones
+  posts        Post[]
+
+  createdAt    DateTime          @default(now())
+  updatedAt    DateTime          @updatedAt
+
+  @@index([spaceGroupId])
+  @@map("post_spaces")
+}
+
+model Post {
+  id          String        @id @default(cuid())
+  title       String?
+  message     String
+  isPinned    Boolean       @default(false)
+
+  // Métricas
+  likesCount  Int           @default(0)      // facilita lecturas rápidas
+
+  // Relaciones
+  postSpaceId String
+  postSpace   PostSpace     @relation(fields: [postSpaceId], references: [id], onDelete: Cascade)
+  creatorId   String
+  creator     User          @relation(fields: [creatorId], references: [id])
+  attachments PostAttachment[]
+  likes       PostLike[]
+
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  @@index([postSpaceId])
+  @@index([creatorId])
+  @@map("posts")
+}
+
+model PostAttachment {
+  id        String          @id @default(cuid())
+  url       String
+  type      AttachmentType
+  postId    String
+  post      Post            @relation(fields: [postId], references: [id], onDelete: Cascade)
+  createdAt DateTime        @default(now())
+
+  @@index([postId])
+  @@map("post_attachments")
+}
+
+enum AttachmentType {
+  IMAGE
+  PDF
+}
+
+model PostLike {
+  id        String   @id @default(cuid())
+  postId    String
+  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@unique([postId, userId])   // cada usuario solo puede dar “like” una vez
+  @@index([postId])
+  @@index([userId])
+  @@map("post_likes")
+}
+
+enum PostRole {
+  ADMIN   
+  AUTHOR  
+  VIEWER 
+}

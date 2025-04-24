@@ -13,12 +13,37 @@ model SpaceGroup {
   createdAt    DateTime      @default(now())
   updatedAt    DateTime      @updatedAt
   courseSpaces CourseSpace[]
-
+  postSpaces   PostSpace[] 
+  members      SpaceGroupMember[]
   @@index([brandId])
   @@map("space_groups")
 }
 
+model SpaceGroupMember {
+  id            String          @id @default(cuid())
+  spaceGroupId  String
+  spaceGroup    SpaceGroup      @relation(fields: [spaceGroupId], references: [id], onDelete: Cascade)
+  userId        String
+  joinedAt      DateTime        @default(now())
+  leftAt        DateTime?
+  canAccess     Boolean         @default(true)
+  user          User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role          SpaceGroupRole  @default(FAN)
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+
+  @@unique([spaceGroupId, userId])
+  @@index([spaceGroupId])
+  @@index([userId])
+  @@map("space_group_members")
+}
+
+
 enum PricingType {
   FREE
   PAID
+}
+enum SpaceGroupRole {
+  FAN     // solo ver
+  AUTHOR  // puede crear posts
 }

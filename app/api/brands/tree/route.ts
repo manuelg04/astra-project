@@ -34,6 +34,14 @@ export async function GET(req: Request) {
               },
             },
           },
+          postSpaces: {
+            orderBy: { createdAt: "asc" },
+            include: {
+              _count: {
+                select: { posts: true },
+              },
+            },
+          },
         },
       },
     },

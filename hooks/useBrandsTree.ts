@@ -21,6 +21,7 @@ export interface SpaceGroupSummary {
   pricingType: "FREE" | "PAID";
   price: string;
   courseSpaces: CourseSpaceSummary[];
+  postSpaces: PostSpaceSummary[];
 }
 
 export interface BrandSummary {
@@ -28,6 +29,12 @@ export interface BrandSummary {
   name: string;
   logoUrl: string | null;
   spaceGroups: SpaceGroupSummary[];
+}
+
+export interface PostSpaceSummary {
+  id: string;
+  name: string;
+  postsCount: number;
 }
 /* ———————————————————————————————————————————————— */
 

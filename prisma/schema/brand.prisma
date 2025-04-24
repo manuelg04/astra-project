@@ -11,8 +11,31 @@ model Brand {
 
   /// Relación 1-N: una Brand posee varios SpaceGroups
   spaceGroups SpaceGroup[]
-
+  members     BrandMember[]
   @@index([createdAt])
   @@index([updatedAt])
   @@map("brands")
 }
+
+model BrandMember {
+  id        String   @id @default(cuid())
+  brandId   String
+  brand     Brand    @relation(fields: [brandId], references: [id])
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  role      BrandRole
+  joinedAt  DateTime @default(now())
+  leftAt    DateTime?
+  canAccess Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("brand_members")
+  @@unique([brandId, userId])
+  @@index([brandId])
+  @@index([userId])
+}
+enum BrandRole {
+  ADMIN
+}
+
