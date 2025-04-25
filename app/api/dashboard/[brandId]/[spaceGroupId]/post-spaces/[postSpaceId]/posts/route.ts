@@ -15,14 +15,14 @@ type RouteParams = {
 /* ────────────────────────────────  POST  ──────────────────────────────── */
 export async function POST(
   req: Request,
-  context: { params: Promise<RouteParams> },
+  context: { params: Promise<RouteParams> }
 ) {
   /* 1 · Auth --------------------------------------------------------- */
   const [, token] = (req.headers.get("authorization") ?? "").split(" ");
   if (!token)
     return NextResponse.json(
       { error: "Missing Bearer token" },
-      { status: 401 },
+      { status: 401 }
     );
 
   let userId: string;
@@ -40,7 +40,7 @@ export async function POST(
   } catch (err) {
     return NextResponse.json(
       { errors: (err as ZodError).errors },
-      { status: 400 },
+      { status: 400 }
     );
   }
 
@@ -55,7 +55,7 @@ export async function POST(
   } catch (err) {
     return NextResponse.json(
       { errors: (err as ZodError).errors },
-      { status: 400 },
+      { status: 400 }
     );
   }
 
@@ -75,7 +75,7 @@ export async function POST(
   if (!postSpace) {
     return NextResponse.json(
       { error: "PostSpace not found in this hierarchy" },
-      { status: 404 },
+      { status: 404 }
     );
   }
 
@@ -89,7 +89,7 @@ export async function POST(
         attachmentsData.push({ url, type: "IMAGE" });
       } else if (dataUrl.startsWith("data:application/pdf")) {
         const [, mime, base64] = dataUrl.match(
-          /^data:(application\/pdf);base64,([a-zA-Z0-9+/=]+)$/i,
+          /^data:(application\/pdf);base64,([a-zA-Z0-9+/=]+)$/i
         )!;
         const buffer = Buffer.from(base64, "base64");
         const url = await uploadBuffer(buffer, mime, "post-attachments");
@@ -136,7 +136,7 @@ export async function POST(
 /* ────────────────────────────────  GET  ──────────────────────────────── */
 export async function GET(
   req: Request,
-  context: { params: Promise<RouteParams> },
+  context: { params: Promise<RouteParams> }
 ) {
   /* 1 · Auth opcional (para verificar membresía) -------------------- */
   const authHeader = req.headers.get("authorization") ?? "";
@@ -158,7 +158,7 @@ export async function GET(
   } catch (err) {
     return NextResponse.json(
       { errors: (err as ZodError).errors },
-      { status: 400 },
+      { status: 400 }
     );
   }
 
@@ -168,7 +168,7 @@ export async function GET(
   }
 
   /* 4 · Listar Posts ------------------------------------------------- */
-  const posts = await prisma.post.findMany({
+  const postsRaw = await prisma.post.findMany({
     where: { postSpaceId },
     orderBy: [{ isPinned: "desc" }, { createdAt: "desc" }],
     select: {
@@ -180,9 +180,24 @@ export async function GET(
       createdAt: true,
       updatedAt: true,
       creator: { select: { id: true, name: true, avatarUrl: true } },
-      attachments: { select: { id: true, url: true, type: true } },
+      // ← solo necesitamos saber si EXISTE un like del usuario
+      likes:
+        userId !== null ? { where: { userId }, select: { id: true } } : false,
     },
   });
+
+  /* 5 · Convertir a formato API ------------------------------------ */
+  const posts = postsRaw.map((p) => ({
+    id: p.id,
+    title: p.title,
+    message: p.message,
+    likesCount: p.likesCount,
+    isPinned: p.isPinned,
+    createdAt: p.createdAt,
+    updatedAt: p.updatedAt,
+    creator: p.creator,
+    liked: userId !== null ? p.likes.length > 0 : false,
+  }));
 
   return NextResponse.json({ data: posts }, { status: 200 });
 }

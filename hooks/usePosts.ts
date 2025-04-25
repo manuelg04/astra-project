@@ -68,15 +68,20 @@ export async function createPost(
   return post;
 }
 
-/* ————— helper: toggle like —————
-   Supone un endpoint POST /api/posts/:postId/like
-   que devuelve { liked: boolean, likesCount: number }
-——————————————————————————————— */
-export async function toggleLike(postId: string) {
+/* ——— helper: toggle like ———
+   Nueva signatura que recibe las 4 IDs para formar la ruta exacta
+————————————————————————————————— */
+export async function toggleLike(
+  brandId: string,
+  spaceGroupId: string,
+  postSpaceId: string,
+  postId: string,
+) {
   const token = getAuthToken();
   if (!token) throw new Error("Unauthenticated");
 
-  const res = await fetch(`/api/posts/${postId}/like`, {
+  const url = `/api/dashboard/${brandId}/${spaceGroupId}/post-spaces/${postSpaceId}/posts/${postId}/likes`;
+  const res = await fetch(url, {
     method: "POST",
     headers: { Authorization: `Bearer ${token}` },
   });

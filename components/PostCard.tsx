@@ -8,29 +8,39 @@ import { formatDistanceToNow } from "date-fns";
 import { es } from "date-fns/locale";
 
 interface Props {
+  brandId: string;
+  spaceGroupId: string;
+  postSpaceId: string;
   post: PostFromApi;
   onMutate: () => void; // revalida lista tras like
 }
 
-export default function PostCard({ post, onMutate }: Props) {
+export default function PostCard({
+  brandId,
+  spaceGroupId,
+  postSpaceId,
+  post,
+  onMutate,
+}: Props) {
   const [optimisticLiked, setOptimisticLiked] = useState(post.liked);
   const [optimisticCount, setOptimisticCount] = useState(post.likesCount);
   const [isSending, setIsSending] = useState(false);
 
   const handleLike = async () => {
     if (isSending) return;
-    // optimista
+
     const nextLiked = !optimisticLiked;
     setOptimisticLiked(nextLiked);
-    setOptimisticCount((c: number) => c + (nextLiked ? 1 : -1));
+    setOptimisticCount((c) => c + (nextLiked ? 1 : -1));
     setIsSending(true);
+
     try {
-      await toggleLike(post.id);
-      onMutate(); // revalidar contra server
+      await toggleLike(brandId, spaceGroupId, postSpaceId, post.id);
+      onMutate(); // revalidar contra el servidor
     } catch {
       // revertir si falla
       setOptimisticLiked(!nextLiked);
-      setOptimisticCount((c: number) => c - (nextLiked ? 1 : -1));
+      setOptimisticCount((c) => c - (nextLiked ? 1 : -1));
     } finally {
       setIsSending(false);
     }

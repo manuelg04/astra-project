@@ -52,7 +52,14 @@ export default function PostSpacePage({ params }: { params: Promise<Params> }) {
           </p>
         ) : (
           posts.map((post: PostFromApi) => (
-            <PostCard key={post.id} post={post} onMutate={mutate} />
+            <PostCard
+              key={post.id}
+              brandId={brandId}
+              spaceGroupId={spaceGroupId}
+              postSpaceId={postSpaceId}
+              post={post}
+              onMutate={mutate}
+            />
           ))
         )}
       </section>

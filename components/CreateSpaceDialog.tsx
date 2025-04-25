@@ -81,10 +81,7 @@ const SpaceKindSelector = ({
         className="flex items-center gap-2 text-base font-semibold text-gray-200"
       >
         <Icon
-          className={cn(
-            "h-5 w-5",
-            checked ? "text-blue-400" : "text-gray-300",
-          )}
+          className={cn("h-5 w-5", checked ? "text-blue-400" : "text-gray-300")}
         />
         {title}
       </span>
@@ -219,7 +216,9 @@ export default function CreateSpaceDialog({
         onCreated();
         reset();
       } else {
-        throw new Error(errors.join("; ") || "No se pudo crear ningún espacio.");
+        throw new Error(
+          errors.join("; ") || "No se pudo crear ningún espacio.",
+        );
       }
     } catch (err) {
       toast({
