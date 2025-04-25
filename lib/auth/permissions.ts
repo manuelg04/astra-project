@@ -65,3 +65,27 @@ export async function isMemberOrPublic(
   });
   return !!member || (await isBrandAdmin(userId, brandId));
 }
+
+export async function canEditPost(
+  userId: string,
+  brandId: string,
+  spaceGroupId: string,
+  postId: string,
+): Promise<boolean> {
+  if (await isBrandAdmin(userId, brandId)) return true;
+
+  const post = await prisma.post.findFirst({
+    where: {
+      id: postId,
+      postSpace: { id: spaceGroupId, spaceGroup: { brandId } },
+    },
+    select: { creatorId: true },
+  });
+  return post?.creatorId === userId;
+}
+
+/**
+ * Para borrar aplicamos la misma regla que para editar.
+ * Si en el futuro quieres políticas distintas, separa la lógica aquí.
+ */
+export const canDeletePost = canEditPost;

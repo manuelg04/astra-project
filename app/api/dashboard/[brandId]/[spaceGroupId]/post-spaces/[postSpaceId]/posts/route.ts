@@ -201,3 +201,4 @@ export async function GET(
 
   return NextResponse.json({ data: posts }, { status: 200 });
 }
+

@@ -92,3 +92,65 @@ export async function toggleLike(
   };
   return json;
 }
+
+/* ——— helper: pin / unpin ——— */
+export async function pinPost(
+  brandId: string,
+  spaceGroupId: string,
+  postSpaceId: string,
+  postId: string,
+) {
+  const token = getAuthToken();
+  if (!token) throw new Error("Unauthenticated");
+
+  const url = `/api/dashboard/${brandId}/${spaceGroupId}/post-spaces/${postSpaceId}/posts/${postId}/pin`;
+  const res = await fetch(url, {
+    method: "POST",
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!res.ok) throw new Error("Failed to pin/unpin post");
+  return res.json();
+}
+
+/* ——— helper: delete post ——— */
+export async function deletePost(
+  brandId: string,
+  spaceGroupId: string,
+  postSpaceId: string,
+  postId: string,
+) {
+  const token = getAuthToken();
+  if (!token) throw new Error("Unauthenticated");
+
+  const url = `/api/dashboard/${brandId}/${spaceGroupId}/post-spaces/${postSpaceId}/posts/${postId}`;
+  const res = await fetch(url, {
+    method: "DELETE",
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!res.ok) throw new Error("Failed to delete post");
+  return res.json();
+}
+
+/* ——— helper: update post (placeholder, por si lo usas en el modal) —— */
+export async function updatePost(
+  brandId: string,
+  spaceGroupId: string,
+  postSpaceId: string,
+  postId: string,
+  payload: { title?: string | null; message?: string | null },
+) {
+  const token = getAuthToken();
+  if (!token) throw new Error("Unauthenticated");
+
+  const url = `/api/dashboard/${brandId}/${spaceGroupId}/post-spaces/${postSpaceId}/posts/${postId}`;
+  const res = await fetch(url, {
+    method: "PATCH",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(payload),
+  });
+  if (!res.ok) throw new Error("Failed to update post");
+  return res.json();
+}
