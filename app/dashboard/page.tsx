@@ -7,12 +7,7 @@ import { LogOut, Building2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 
-import {
-  getUserProfile,
-  logout,
-  UserProfile,
-  getAuthToken,
-} from "@/lib/auth";
+import { getUserProfile, logout, UserProfile, getAuthToken } from "@/lib/auth";
 
 /* ─────────── Tipos API ─────────── */
 interface CourseSpaceSummary {

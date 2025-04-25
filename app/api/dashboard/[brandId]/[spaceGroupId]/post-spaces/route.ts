@@ -42,7 +42,7 @@ export async function POST(
   }
 
   /* 3 · Body --------------------------------------------------------- */
-  let payload: { name: string; description?: string };
+  let payload: { name: string; description?: string | null };
   try {
     payload = createPostSpaceSchema.parse(await req.json());
   } catch (err) {

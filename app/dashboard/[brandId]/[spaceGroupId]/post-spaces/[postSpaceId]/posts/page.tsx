@@ -1,7 +1,9 @@
-import { formatDistanceToNow } from "date-fns";
-import { es } from "date-fns/locale";
+"use client";
+
+import React from "react";
 import PostComposer from "@/components/PostComposer";
-import PostCard, { Post } from "@/components/PostCard";
+import PostCard from "@/components/PostCard";
+import { usePosts, PostFromApi } from "@/hooks/usePosts";
 
 interface Params {
   brandId: string;
@@ -9,54 +11,49 @@ interface Params {
   postSpaceId: string;
 }
 
-/**
- *  Vista offline: usa datos dummy.
- *  Cuando integres el backend reemplaza `mockPosts`.
- */
-export default async function PostSpacePage({ params }: { params: Params }) {
-  const { postSpaceId } = await params;
+/* 1) indicamos que `params` es una **promesa** */
+export default function PostSpacePage({ params }: { params: Promise<Params> }) {
+  /* 2) lo desenvolvemos con React.use() */
+  const { brandId, spaceGroupId, postSpaceId } = React.use(params);
 
-  /* —— datos simulados ——————————————————— */
-  const mockPosts: Post[] = [
-    {
-      id: "p1",
-      title: null,
-      message: "ewr",
-      isPinned: false,
-      likesCount: 1,
-      relativeDate: formatDistanceToNow(
-        new Date(Date.now() - 6 * 60 * 60 * 1000),
-        { addSuffix: true, locale: es },
-      ),
-      authorName: "pasto",
-      authorImage: "/avatar-placeholder.png",
-      authorRole: "CREATOR",
-    },
-  ];
-  /* ———————————————————————————————————— */
+  const { posts, isLoading, error, mutate } = usePosts(
+    brandId,
+    spaceGroupId,
+    postSpaceId,
+  );
 
   return (
     <main className="flex flex-col gap-6 px-4 pb-12 md:px-6 lg:px-8">
-      {/* cabecera + composer */}
       <header className="space-y-4">
         <h1 className="text-2xl md:text-3xl font-bold text-foreground">
           Posts
         </h1>
-        <PostComposer postSpaceId={postSpaceId} />
+
+        <PostComposer
+          brandId={brandId}
+          spaceGroupId={spaceGroupId}
+          postSpaceId={postSpaceId}
+          onCreated={mutate}
+        />
       </header>
 
-      {/* lista de posts */}
       <section className="space-y-4">
         <h2 className="text-sm uppercase tracking-wider text-muted-foreground">
           All posts
         </h2>
 
-        {mockPosts.length === 0 ? (
+        {isLoading ? (
+          <p className="text-muted-foreground text-sm">Cargando…</p>
+        ) : error ? (
+          <p className="text-red-500 text-sm">Error al cargar publicaciones</p>
+        ) : posts.length === 0 ? (
           <p className="text-muted-foreground text-sm">
             Aún no hay publicaciones. ¡Sé el primero en compartir algo!
           </p>
         ) : (
-          mockPosts.map((post) => <PostCard key={post.id} post={post} />)
+          posts.map((post: PostFromApi) => (
+            <PostCard key={post.id} post={post} onMutate={mutate} />
+          ))
         )}
       </section>
     </main>

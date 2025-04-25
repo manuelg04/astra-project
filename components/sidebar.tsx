@@ -77,9 +77,7 @@ export default function Sidebar() {
       {/* brand selector -------------------------------------------- */}
       <div className="p-4 border-b border-sidebar-border">
         {brands.length === 0 ? (
-          <p className="text-sm text-sidebar-foreground/70">
-            Sin comunidades
-          </p>
+          <p className="text-sm text-sidebar-foreground/70">Sin comunidades</p>
         ) : (
           <Select value={selectedBrand} onValueChange={setSelectedBrand}>
             <SelectTrigger className="w-full bg-secondary">

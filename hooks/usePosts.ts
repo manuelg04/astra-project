@@ -1,0 +1,89 @@
+/* lib/hooks/usePosts.ts -------------------------------------------------- */
+import useSWR, { mutate as globalMutate } from "swr";
+import { getAuthToken } from "@/lib/auth";
+
+export interface PostFromApi {
+  id: string;
+  title: string | null;
+  message: string;
+  isPinned: boolean;
+  likesCount: number;
+  liked: boolean; // ← backend debe devolverlo
+  createdAt: string;
+  creator: {
+    // ← select en tu API
+    id: string;
+    name: string | null;
+    avatarUrl: string | null;
+  };
+}
+
+const fetcher = async (url: string) => {
+  const token = getAuthToken();
+  const res = await fetch(url, {
+    headers: token ? { Authorization: `Bearer ${token}` } : {},
+    next: { revalidate: 0 },
+  });
+  if (!res.ok) throw new Error("Failed to fetch posts");
+  const { data } = (await res.json()) as { data: PostFromApi[] };
+  return data;
+};
+
+export function usePosts(
+  brandId: string,
+  spaceGroupId: string,
+  postSpaceId: string,
+) {
+  const key = `/api/dashboard/${brandId}/${spaceGroupId}/post-spaces/${postSpaceId}/posts`;
+  const { data, error, isLoading, mutate } = useSWR<PostFromApi[]>(
+    key,
+    fetcher,
+  );
+  return { posts: data ?? [], error, isLoading, mutate };
+}
+
+/* ————— helper: crear post ————— */
+export async function createPost(
+  brandId: string,
+  spaceGroupId: string,
+  postSpaceId: string,
+  payload: { title?: string; message: string },
+) {
+  const token = getAuthToken();
+  if (!token) throw new Error("Unauthenticated");
+
+  const url = `/api/dashboard/${brandId}/${spaceGroupId}/post-spaces/${postSpaceId}/posts`;
+  const res = await fetch(url, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(payload),
+  });
+  if (!res.ok) throw new Error("Failed to create post");
+  const post = await res.json();
+  /* revalida globalmente el key */
+  globalMutate(url);
+  return post;
+}
+
+/* ————— helper: toggle like —————
+   Supone un endpoint POST /api/posts/:postId/like
+   que devuelve { liked: boolean, likesCount: number }
+——————————————————————————————— */
+export async function toggleLike(postId: string) {
+  const token = getAuthToken();
+  if (!token) throw new Error("Unauthenticated");
+
+  const res = await fetch(`/api/posts/${postId}/like`, {
+    method: "POST",
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!res.ok) throw new Error("Failed to toggle like");
+  const json = (await res.json()) as {
+    liked: boolean;
+    likesCount: number;
+  };
+  return json;
+}

@@ -179,6 +179,7 @@ export async function GET(
       isPinned: true,
       createdAt: true,
       updatedAt: true,
+      creator: { select: { id: true, name: true, avatarUrl: true } },
       attachments: { select: { id: true, url: true, type: true } },
     },
   });

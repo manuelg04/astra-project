@@ -1,19 +1,41 @@
-import { Pin, Heart } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
+"use client";
 
-export interface Post {
-  id: string;
-  title: string | null;
-  message: string;
-  isPinned: boolean;
-  likesCount: number;
-  relativeDate: string;
-  authorName: string;
-  authorImage: string | null;
-  authorRole: string | null;
+import { Pin, Heart } from "lucide-react";
+import { toggleLike, PostFromApi } from "@/hooks/usePosts";
+import { useState } from "react";
+import Image from "next/image";
+import { formatDistanceToNow } from "date-fns";
+import { es } from "date-fns/locale";
+
+interface Props {
+  post: PostFromApi;
+  onMutate: () => void; // revalida lista tras like
 }
 
-export default function PostCard({ post }: { post: Post }) {
+export default function PostCard({ post, onMutate }: Props) {
+  const [optimisticLiked, setOptimisticLiked] = useState(post.liked);
+  const [optimisticCount, setOptimisticCount] = useState(post.likesCount);
+  const [isSending, setIsSending] = useState(false);
+
+  const handleLike = async () => {
+    if (isSending) return;
+    // optimista
+    const nextLiked = !optimisticLiked;
+    setOptimisticLiked(nextLiked);
+    setOptimisticCount((c: number) => c + (nextLiked ? 1 : -1));
+    setIsSending(true);
+    try {
+      await toggleLike(post.id);
+      onMutate(); // revalidar contra server
+    } catch {
+      // revertir si falla
+      setOptimisticLiked(!nextLiked);
+      setOptimisticCount((c: number) => c - (nextLiked ? 1 : -1));
+    } finally {
+      setIsSending(false);
+    }
+  };
+
   return (
     <article
       className={`relative rounded-xl border border-border bg-card/70 p-5 transition-shadow hover:shadow-md ${
@@ -29,28 +51,28 @@ export default function PostCard({ post }: { post: Post }) {
 
       {/* encabezado */}
       <header className="mb-3 flex items-center gap-3">
-        <img
-          src={post.authorImage ?? "/avatar-placeholder.png"}
-          alt={post.authorName}
-          className="h-8 w-8 rounded-full object-cover"
+        <Image
+          src={post.creator.avatarUrl ?? "/avatar-placeholder.png"}
+          alt={post.creator.name ?? "user"}
+          width={32}
+          height={32}
+          className="rounded-full object-cover"
         />
 
         <div className="flex flex-wrap items-center gap-2">
           <span className="text-sm font-medium text-foreground">
-            {post.authorName}
+            {post.creator.name ?? "Anon"}
           </span>
 
-          {post.authorRole === "CREATOR" && (
-            <Badge variant="secondary">Creator</Badge>
-          )}
-
           <span className="text-xs text-muted-foreground">
-            {post.relativeDate}
+            {formatDistanceToNow(new Date(post.createdAt), {
+              addSuffix: true,
+              locale: es,
+            })}
           </span>
         </div>
       </header>
 
-      {/* contenido */}
       {post.title && (
         <h2 className="mb-1 text-lg font-semibold text-foreground">
           {post.title}
@@ -62,12 +84,17 @@ export default function PostCard({ post }: { post: Post }) {
 
       {/* footer */}
       <footer className="mt-4 flex items-center gap-2 border-t border-border pt-4 text-sm text-muted-foreground">
-        <Heart
-          className={`mr-1 h-4 w-4 ${
-            post.likesCount ? "fill-rose-600 text-rose-600" : "text-muted-foreground"
-          }`}
-        />
-        {post.likesCount}
+        <button
+          className="flex items-center gap-1 focus:outline-none"
+          onClick={handleLike}
+        >
+          <Heart
+            className={`h-4 w-4 ${
+              optimisticLiked ? "fill-rose-600 text-rose-600" : ""
+            }`}
+          />
+          {optimisticCount}
+        </button>
       </footer>
     </article>
   );
