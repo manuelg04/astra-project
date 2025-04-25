@@ -1,13 +1,6 @@
 "use client";
 
-import {
-  Pin,
-  Heart,
-  MoreHorizontal,
-  Edit,
-  Trash2,
-  PinOff,
-} from "lucide-react";
+import { Pin, Heart, MoreHorizontal, Edit, Trash2, PinOff } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -119,16 +112,10 @@ export default function PostCard({
     setIsSaving(true);
     setErrorMsg(null);
     try {
-      await updatePost(
-        brandId,
-        spaceGroupId,
-        postSpaceId,
-        post.id,
-        {
-          title: editTitle.trim() ? editTitle.trim() : null,
-          message: editMessage.trim(),
-        },
-      );
+      await updatePost(brandId, spaceGroupId, postSpaceId, post.id, {
+        title: editTitle.trim() ? editTitle.trim() : null,
+        message: editMessage.trim(),
+      });
       setIsEditing(false);
       onMutate();
     } catch (err) {
@@ -161,10 +148,7 @@ export default function PostCard({
 
             <DropdownMenuContent align="end">
               {/* --- Pin / Unpin --- */}
-              <DropdownMenuItem
-                onClick={handlePinToggle}
-                disabled={isPinning}
-              >
+              <DropdownMenuItem onClick={handlePinToggle} disabled={isPinning}>
                 {post.isPinned ? (
                   <>
                     <PinOff className="mr-2 h-4 w-4" />
@@ -268,9 +252,7 @@ export default function PostCard({
             className="resize-none"
           />
 
-          {errorMsg && (
-            <p className="text-sm text-destructive">{errorMsg}</p>
-          )}
+          {errorMsg && <p className="text-sm text-destructive">{errorMsg}</p>}
 
           <div className="flex gap-3">
             <Button
@@ -286,11 +268,7 @@ export default function PostCard({
             >
               Cancel
             </Button>
-            <Button
-              size="sm"
-              onClick={handleSave}
-              disabled={isSaving}
-            >
+            <Button size="sm" onClick={handleSave} disabled={isSaving}>
               {isSaving ? "Saving…" : "Save"}
             </Button>
           </div>

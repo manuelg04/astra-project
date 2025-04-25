@@ -3,10 +3,7 @@ import { prisma } from "@/lib/db";
 import { verifyJWT } from "@/lib/jwt";
 import { canEditPost } from "@/lib/auth/permissions";
 import { ZodError } from "zod";
-import {
-  paramsSchema,
-  type RouteParams,
-} from "@/lib/validators/postUpdate";
+import { paramsSchema, type RouteParams } from "@/lib/validators/postUpdate";
 
 /* ────────────────────────────────  POST  ──────────────────────────────── */
 export async function POST(
@@ -16,7 +13,10 @@ export async function POST(
   /* 1 · Auth */
   const [, token] = (req.headers.get("authorization") ?? "").split(" ");
   if (!token)
-    return NextResponse.json({ error: "Missing Bearer token" }, { status: 401 });
+    return NextResponse.json(
+      { error: "Missing Bearer token" },
+      { status: 401 },
+    );
 
   let userId: string;
   try {
@@ -26,7 +26,10 @@ export async function POST(
   }
 
   /* 2 · Params */
-  let brandId: string, spaceGroupId: string, postSpaceId: string, postId: string;
+  let brandId: string,
+    spaceGroupId: string,
+    postSpaceId: string,
+    postId: string;
   try {
     ({ brandId, spaceGroupId, postSpaceId, postId } = await context.params);
     paramsSchema.parse({ brandId, spaceGroupId, postSpaceId, postId });

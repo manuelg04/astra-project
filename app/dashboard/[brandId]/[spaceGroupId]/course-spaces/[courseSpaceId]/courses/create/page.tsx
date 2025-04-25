@@ -91,7 +91,7 @@ export default function CreateCoursePage({ params }: Props) {
       <div className="max-w-4xl mx-auto p-8">
         <div className="mb-8">
           <Link
-            href={`/dashboard/${brandId}/${spaceGroupId}/${courseSpaceId}`}
+            href={`/dashboard/${brandId}/${spaceGroupId}/course-spaces/${courseSpaceId}/courses`}
             className="inline-flex items-center text-primary hover:text-primary/80 transition-colors"
           >
             <ArrowLeft className="h-4 w-4 mr-2" />

@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { Pencil, Eye } from "lucide-react";
+import { Pencil, Eye, Plus } from "lucide-react"; // Import Plus icon
 import { prisma } from "@/lib/db";
 
 interface Params {
@@ -60,7 +60,7 @@ export default async function CourseSpacePage({ params }: { params: Params }) {
       id: true,
       name: true,
       description: true,
-      image: true,
+      image: true, // Changed from imageUrl to image based on schema
       _count: { select: { chapters: true } },
     },
   });
@@ -68,11 +68,22 @@ export default async function CourseSpacePage({ params }: { params: Params }) {
   return (
     <div className="p-6 bg-gray-900 min-h-screen text-white">
       {/* Header */}
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold mb-1">{courseSpace.title}</h1>
-        <p className="text-gray-400">
-          {courses.length} curso{courses.length !== 1 ? "s" : ""}
-        </p>
+      <div className="mb-8 flex justify-between items-center">
+        <div>
+          <h1 className="text-3xl font-bold mb-1">{courseSpace.title}</h1>
+          <p className="text-gray-400">
+            {courses.length} curso{courses.length !== 1 ? "s" : ""}
+          </p>
+        </div>
+        {/* Add Course Button */}
+        <Link
+          href={`/dashboard/${brandId}/${spaceGroupId}/course-spaces/${courseSpaceId}/courses/create`}
+        >
+          <button className="bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-md flex items-center space-x-2">
+            <Plus className="w-4 h-4" />
+            <span>Crear curso</span>
+          </button>
+        </Link>
       </div>
 
       {/* Empty State */}
@@ -82,6 +93,7 @@ export default async function CourseSpacePage({ params }: { params: Params }) {
             <Pencil className="w-16 h-16 mx-auto mb-4 text-blue-500" />
             <h2 className="text-2xl font-semibold mb-3">No hay cursos</h2>
             <p className="text-gray-400 mb-6">Empieza creando uno</p>
+            {/* Link already exists here, no need to duplicate the top one */}
             <Link
               href={`/dashboard/${brandId}/${spaceGroupId}/${courseSpaceId}/courses/create`}
             >
@@ -101,6 +113,7 @@ export default async function CourseSpacePage({ params }: { params: Params }) {
             >
               <div className="relative h-48 w-full">
                 <Image
+                  // Use course.image which is the correct field name from prisma query
                   src={course.image ?? "/images/placeholder.jpg"}
                   alt={course.name}
                   fill
@@ -111,13 +124,13 @@ export default async function CourseSpacePage({ params }: { params: Params }) {
                 <div className="flex-grow">
                   <h2 className="text-xl font-semibold mb-1">{course.name}</h2>
                   <p className="text-sm text-gray-400">
-                    {course._count.chapters} chapter
+                    {course._count.chapters} capítulo
                     {course._count.chapters !== 1 ? "s" : ""}
                   </p>
                 </div>
                 <div className="mt-4 flex items-center justify-between">
                   <Link
-                    href={`/dashboard/${brandId}/${spaceGroupId}/${courseSpaceId}/courses/${course.id}`}
+                    href={`/dashboard/${brandId}/${spaceGroupId}/course-spaces/${courseSpaceId}/courses/${course.id}`}
                     className="flex-1 mr-2"
                   >
                     <button className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-md flex items-center justify-center space-x-2">
@@ -125,9 +138,10 @@ export default async function CourseSpacePage({ params }: { params: Params }) {
                       <span>Ver curso</span>
                     </button>
                   </Link>
+                  {/* TODO: Add link/functionality to edit button */}
                   <button className="bg-gray-600 hover:bg-gray-500 text-gray-200 py-2 px-3 rounded-md flex items-center space-x-1">
                     <Pencil className="w-4 h-4" />
-                    <span>Edit</span>
+                    <span>Editar</span>
                   </button>
                 </div>
               </div>

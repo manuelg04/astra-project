@@ -18,6 +18,6 @@ export const paramsSchema = z.object({
 
 /* ---------- body validator ---------- */
 export const updatePostSchema = z.object({
-  title: z.string().min(1).max(200).nullable().optional(),   // ← title sí puede ser null
-  message: z.string().min(1).max(10_000).optional(),         // ← NO nullable
+  title: z.string().min(1).max(200).nullable().optional(), // ← title sí puede ser null
+  message: z.string().min(1).max(10_000).optional(), // ← NO nullable
 });
