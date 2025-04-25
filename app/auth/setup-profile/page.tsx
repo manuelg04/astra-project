@@ -18,7 +18,7 @@ export default function SetupProfilePage() {
   const [errors, setErrors] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
-  /* Convierte el archivo a Base64 para enviarlo como URL data:image/...   */
+  /* Base64 util --------------------------------------------------- */
   const fileToBase64 = (file: File): Promise<string> =>
     new Promise((resolve, reject) => {
       const reader = new FileReader();
@@ -34,25 +34,12 @@ export default function SetupProfilePage() {
 
     try {
       let avatarUrl: string | undefined = undefined;
-      if (avatarFile) {
-        try {
-          avatarUrl = await fileToBase64(avatarFile);
-        } catch (error) {
-          console.error("Error converting file to base64:", error);
-          setErrors("Error processing profile picture. Try again.");
-          setIsLoading(false);
-          return;
-        }
-      }
+      if (avatarFile) avatarUrl = await fileToBase64(avatarFile);
 
       const ok = await setupUserProfile(fullName, phone, avatarUrl ?? "");
-      if (ok) {
-        router.push("/dashboard");
-      } else {
-        setErrors("Unable to save profile. Try again.");
-      }
-    } catch (error) {
-      console.error("Error setting up profile:", error);
+      if (ok) router.push("/dashboard");
+      else setErrors("Unable to save profile. Try again.");
+    } catch {
       setErrors("Something went wrong. Try again.");
     } finally {
       setIsLoading(false);
@@ -60,41 +47,35 @@ export default function SetupProfilePage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-50 to-indigo-50">
-      <div className="w-full max-w-md p-8 space-y-8 bg-white rounded-2xl shadow-xl">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary/20 to-primary/5">
+      <div className="w-full max-w-md p-8 space-y-8 bg-card border border-border rounded-2xl shadow-lg">
+        {/* Header */}
         <div className="text-center">
-          <div className="mx-auto w-16 h-16 bg-gradient-to-r from-purple-600 to-indigo-600 rounded-full flex items-center justify-center">
-            <ImageIcon className="w-8 h-8 text-white" />
+          <div className="mx-auto w-16 h-16 bg-primary rounded-full flex items-center justify-center">
+            <ImageIcon className="w-8 h-8 text-primary-foreground" />
           </div>
-          <h2 className="mt-6 text-3xl font-extrabold text-gray-900">
+          <h2 className="mt-6 text-3xl font-extrabold text-foreground">
             Set up your profile
           </h2>
-          <p className="mt-2 text-sm text-gray-600">
+          <p className="mt-2 text-sm text-muted-foreground">
             Complete your profile to continue (profile picture is optional)
           </p>
         </div>
 
+        {/* Form */}
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           <div className="space-y-2">
-            <Label
-              htmlFor="avatar"
-              className="text-sm font-medium text-gray-700"
-            >
-              Profile picture (Optional)
-            </Label>
+            <Label htmlFor="avatar">Profile picture (Optional)</Label>
             <Input
               id="avatar"
               type="file"
               accept="image/*"
-              // removed required attribute
               onChange={(e) => setAvatarFile(e.target.files?.[0] || null)}
             />
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="name" className="text-sm font-medium text-gray-700">
-              Full name
-            </Label>
+            <Label htmlFor="name">Full name</Label>
             <Input
               id="name"
               type="text"
@@ -102,17 +83,11 @@ export default function SetupProfilePage() {
               onChange={(e) => setFullName(e.target.value)}
               placeholder="John Doe"
               required
-              className="h-12 px-4 border-gray-300 focus:ring-purple-500 focus:border-purple-500"
             />
           </div>
 
           <div className="space-y-2">
-            <Label
-              htmlFor="phone"
-              className="text-sm font-medium text-gray-700"
-            >
-              Phone number
-            </Label>
+            <Label htmlFor="phone">Phone number</Label>
             <Input
               id="phone"
               type="tel"
@@ -120,7 +95,6 @@ export default function SetupProfilePage() {
               onChange={(e) => setPhone(e.target.value)}
               placeholder="+57 300 123 4567"
               required
-              className="h-12 px-4 border-gray-300 focus:ring-purple-500 focus:border-purple-500"
             />
           </div>
 
@@ -129,7 +103,7 @@ export default function SetupProfilePage() {
           <Button
             type="submit"
             disabled={isLoading}
-            className="w-full h-12 mt-4 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white font-medium rounded-lg"
+            className="w-full h-12 mt-4"
           >
             {isLoading ? (
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />

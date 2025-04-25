@@ -238,24 +238,23 @@ export default function CreateSpaceDialog({
   /* ----------------------------- UI ------------------------------- */
   return (
     <Dialog open={open} onOpenChange={(isOpen) => !isOpen && reset()}>
-      {/* Changed sm:max-w-2xl to sm:max-w-4xl */}
-      <DialogContent className="sm:max-w-4xl bg-white dark:bg-gray-950 rounded-xl shadow-2xl border dark:border-gray-800 p-0">
+      <DialogContent className="sm:max-w-4xl bg-card border border-border p-0">
         {step === 1 && group && (
           <Fragment>
-            <DialogHeader className="p-6 pb-4 border-b dark:border-gray-800">
-              <DialogTitle className="text-xl font-bold flex items-center gap-2 text-gray-900 dark:text-gray-50">
-                <FolderPlus className="h-5 w-5 text-blue-500" />
+            <DialogHeader className="p-6 pb-4 border-b border-border">
+              <DialogTitle className="text-xl font-bold flex items-center gap-2 text-foreground">
+                <FolderPlus className="h-5 w-5 text-primary" />
                 Crear nueva entidad en {group.name}
               </DialogTitle>
-              <DialogDescription className="text-gray-600 dark:text-gray-400 mt-1">
+              <DialogDescription className="text-muted-foreground mt-1">
                 Elige qué tipo de contenido quieres añadir a este grupo.
               </DialogDescription>
             </DialogHeader>
 
             <div className="p-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {/* Option 1: Space Group (Coming Soon) */}
+              {/* Próximamente */}
               <div
-                className="relative group flex flex-col items-center justify-center p-6 rounded-lg border-2 border-dashed border-gray-300 dark:border-gray-700 text-center transition-colors duration-200 ease-in-out bg-gray-50 dark:bg-gray-900 opacity-60 cursor-not-allowed"
+                className="relative group flex flex-col items-center justify-center p-6 rounded-lg border-2 border-dashed border-border text-center opacity-60 cursor-not-allowed bg-muted/10"
                 onClick={() =>
                   toast({
                     title: "Próximamente",
@@ -264,38 +263,36 @@ export default function CreateSpaceDialog({
                   })
                 }
               >
-                <FolderPlus className="h-10 w-10 text-gray-400 dark:text-gray-500 mb-3" />
-                <span className="font-semibold text-gray-700 dark:text-gray-300">
+                <FolderPlus className="h-10 w-10 text-muted-foreground mb-3" />
+                <span className="font-semibold text-foreground">
                   Space Group
                 </span>
-                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                <p className="text-xs text-muted-foreground mt-1">
                   Organiza spaces relacionados.
                 </p>
-                <span className="absolute top-2 right-2 bg-yellow-200 text-yellow-800 text-xs font-semibold px-2 py-0.5 rounded-full dark:bg-yellow-900 dark:text-yellow-300">
+                <span className="absolute top-2 right-2 bg-yellow-600/20 text-yellow-300 text-xs font-semibold px-2 py-0.5 rounded-full">
                   Pronto
                 </span>
               </div>
 
-              {/* Option 2: Space */}
+              {/* Botón Space */}
               <button
-                className="group flex flex-col items-center justify-center p-6 rounded-lg border-2 border-gray-300 dark:border-gray-700 text-center transition-all duration-200 ease-in-out hover:border-blue-500 hover:bg-blue-50 dark:hover:border-blue-600 dark:hover:bg-blue-900/20 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-950 bg-white dark:bg-gray-900"
+                className="group flex flex-col items-center justify-center p-6 rounded-lg border border-border text-center transition-all hover:border-primary hover:bg-primary/10 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
                 onClick={() => setStep(2)}
               >
-                <FileText className="h-10 w-10 text-blue-500 group-hover:text-blue-600 dark:text-blue-400 dark:group-hover:text-blue-500 mb-3 transition-colors" />
-                <span className="font-semibold text-gray-800 dark:text-gray-100">
-                  Space
-                </span>
-                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                <FileText className="h-10 w-10 text-primary group-hover:text-primary/80 mb-3 transition-colors" />
+                <span className="font-semibold text-foreground">Space</span>
+                <p className="text-xs text-muted-foreground mt-1">
                   Contiene Posts o Cursos.
                 </p>
               </button>
             </div>
 
-            <DialogFooter className="p-6 pt-4 border-t dark:border-gray-800 bg-gray-50 dark:bg-gray-900/50 rounded-b-xl">
+            <DialogFooter className="p-6 pt-4 border-t border-border bg-muted/10">
               <Button
                 variant="ghost"
                 onClick={reset}
-                className="flex items-center gap-1 text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100"
+                className="flex items-center gap-1 text-muted-foreground"
               >
                 <X className="h-4 w-4" />
                 Cancelar
@@ -306,11 +303,11 @@ export default function CreateSpaceDialog({
 
         {step === 2 && group && (
           <Fragment>
-            <DialogHeader className="p-6 pb-4 border-b dark:border-gray-800">
-              <DialogTitle className="text-xl font-bold text-gray-900 dark:text-gray-50">
+            <DialogHeader className="p-6 pb-4 border-b border-border">
+              <DialogTitle className="text-xl font-bold text-foreground">
                 Configura tu nuevo Space
               </DialogTitle>
-              <DialogDescription className="text-gray-600 dark:text-gray-400 mt-1">
+              <DialogDescription className="text-muted-foreground mt-1">
                 Selecciona qué funcionalidades tendrá este space. Puedes elegir
                 una o ambas.
               </DialogDescription>
@@ -339,32 +336,29 @@ export default function CreateSpaceDialog({
               />
             </div>
 
-            <DialogFooter className="p-6 pt-4 border-t dark:border-gray-800 flex justify-between items-center bg-gray-50 dark:bg-gray-900/50 rounded-b-xl">
+            <DialogFooter className="p-6 pt-4 border-t border-border bg-muted/10 flex justify-between">
               <Button
                 variant="ghost"
                 onClick={() => setStep(1)}
-                className="text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100 flex items-center gap-1"
+                className="flex items-center gap-1 text-muted-foreground"
               >
                 <ArrowLeft className="h-4 w-4" />
                 Atrás
               </Button>
+
               <div className="flex gap-3">
-                <Button
-                  variant="outline"
-                  onClick={reset}
-                  className="border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
-                >
+                <Button variant="outline" onClick={reset}>
                   Cancelar
                 </Button>
+
                 <Button
                   onClick={handleCreate}
                   disabled={spaceKinds.size === 0 || isCreating}
-                  className="bg-blue-600 hover:bg-blue-700 text-white flex items-center gap-1.5 disabled:opacity-50 disabled:cursor-not-allowed px-5 py-2.5"
                 >
                   {isCreating ? (
                     <>
                       <svg
-                        className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
+                        className="animate-spin -ml-1 mr-2 h-4 w-4"
                         xmlns="http://www.w3.org/2000/svg"
                         fill="none"
                         viewBox="0 0 24 24"
@@ -376,12 +370,12 @@ export default function CreateSpaceDialog({
                           r="10"
                           stroke="currentColor"
                           strokeWidth="4"
-                        ></circle>
+                        />
                         <path
                           className="opacity-75"
                           fill="currentColor"
                           d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                        ></path>
+                        />
                       </svg>
                       Creando...
                     </>

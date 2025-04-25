@@ -2,16 +2,19 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { LogOut, Building2, BookOpen } from "lucide-react";
+import { LogOut, Building2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 
-import { getUserProfile, logout, UserProfile, getAuthToken } from "@/lib/auth";
+import {
+  getUserProfile,
+  logout,
+  UserProfile,
+  getAuthToken,
+} from "@/lib/auth";
 
-/* ──────────────────────────────────────────────────────────── */
-/*  Tipos – coinciden con la respuesta de /api/brands/tree     */
-/* ──────────────────────────────────────────────────────────── */
+/* ─────────── Tipos API ─────────── */
 interface CourseSpaceSummary {
   id: string;
   title: string;
@@ -37,9 +40,7 @@ interface BrandSummary {
   spaceGroups: SpaceGroupSummary[];
 }
 
-/* ──────────────────────────────────────────────────────────── */
-/*  Componente                                                 */
-/* ──────────────────────────────────────────────────────────── */
+/* ─────────── Componente ─────────── */
 export default function DashboardPage() {
   const router = useRouter();
 
@@ -47,11 +48,11 @@ export default function DashboardPage() {
   const [brands, setBrands] = useState<BrandSummary[]>([]);
   const [loading, setLoading] = useState(true);
 
-  /* 1 · Cargar perfil + brands ------------------------------------- */
+  /* 1 · Cargar perfil + brands */
   useEffect(() => {
     (async () => {
       try {
-        /* Perfil ---------------------------------------------------- */
+        /* Perfil */
         const profile = await getUserProfile();
         if (!profile) {
           router.push("/auth");
@@ -59,7 +60,7 @@ export default function DashboardPage() {
         }
         setUser(profile);
 
-        /* Brands / SpaceGroups -------------------------------------- */
+        /* Brands / SpaceGroups */
         const token = getAuthToken();
         if (!token) {
           router.push("/auth");
@@ -69,7 +70,6 @@ export default function DashboardPage() {
         const res = await fetch("/api/brands/tree", {
           headers: { Authorization: `Bearer ${token}` },
         });
-        console.log(res);
         if (!res.ok) throw new Error("Unable to fetch brands");
 
         const data = (await res.json()) as { brands: BrandSummary[] };
@@ -82,19 +82,19 @@ export default function DashboardPage() {
     })();
   }, [router]);
 
-  /* 2 · Logout ----------------------------------------------------- */
+  /* 2 · Logout */
   const handleLogout = () => {
     logout();
     router.push("/auth");
   };
 
-  /* 3 · Loading ---------------------------------------------------- */
+  /* 3 · Loading */
   if (loading) {
     return (
       <div className="flex items-center justify-center h-full">
         <div className="text-center">
-          <div className="w-16 h-16 border-4 border-purple-600 border-t-transparent rounded-full animate-spin mx-auto" />
-          <p className="mt-4 text-lg text-gray-700 dark:text-gray-300">
+          <div className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto" />
+          <p className="mt-4 text-lg text-muted-foreground">
             Loading dashboard...
           </p>
         </div>
@@ -102,41 +102,41 @@ export default function DashboardPage() {
     );
   }
 
-  /* 4 · UI --------------------------------------------------------- */
+  /* 4 · UI */
   return (
     <div>
-      {/* Header ----------------------------------------------------- */}
+      {/* Header */}
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+        <h1 className="text-2xl font-bold text-foreground">
           Dashboard Overview
         </h1>
 
         <Button
           onClick={handleLogout}
           variant="outline"
-          className="flex items-center gap-2"
+          className="flex items-center gap-2 border-border"
         >
           <LogOut className="w-4 h-4" />
           Sign out
         </Button>
       </div>
 
-      {/* Perfil ----------------------------------------------------- */}
+      {/* Perfil */}
       {user && (
-        <Card className="mb-8">
+        <Card className="mb-8 bg-card border border-border">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Building2 className="h-5 w-5 text-purple-600" />
+            <CardTitle className="flex items-center gap-2 text-foreground">
+              <Building2 className="h-5 w-5 text-primary" />
               Bienvenido, {user.fullName || user.email}
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-gray-600 dark:text-gray-400">{user.email}</p>
+            <p className="text-muted-foreground">{user.email}</p>
           </CardContent>
         </Card>
       )}
 
-      {/* Brands ----------------------------------------------------- */}
+      {/* Aquí irán las brands / métricas */}
     </div>
   );
 }

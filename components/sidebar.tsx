@@ -25,15 +25,14 @@ import CreateSpaceDialog from "./CreateSpaceDialog";
 import ThemeToggle from "./ThemeToggle";
 import {
   BrandSummary,
-  CourseSpaceSummary,
-  SpaceGroupSummary,
   useBrandsTree,
   mutateBrandsTree,
+  SpaceGroupSummary,
 } from "@/hooks/useBrandsTree";
 
 /* ---------------------------------------------------------------- */
 export default function Sidebar() {
-  /* usuario -------------------------------------------------------- */
+  /* usuario ------------------------------------------------------- */
   const [user, setUser] = useState<UserProfile | null>(null);
   useEffect(() => {
     getUserProfile()
@@ -41,50 +40,58 @@ export default function Sidebar() {
       .catch(() => {});
   }, []);
 
-  /* tree ----------------------------------------------------------- */
+  /* tree ---------------------------------------------------------- */
   const { data, error, isLoading } = useBrandsTree();
   const brands: BrandSummary[] = data?.brands ?? [];
 
-  /* brand seleccionada -------------------------------------------- */
+  /* brand seleccionada ------------------------------------------- */
   const [selectedBrand, setSelectedBrand] = useState<string | undefined>();
   useEffect(() => {
     if (!selectedBrand && brands.length) setSelectedBrand(brands[0].id);
   }, [brands, selectedBrand]);
 
-  /* diálogos ------------------------------------------------------- */
+  /* diálogos ------------------------------------------------------ */
   const [editing, setEditing] = useState<SpaceGroupSummary | null>(null);
   const [creating, setCreating] = useState<SpaceGroupSummary | null>(null);
 
-  /* loading / error ------------------------------------------------ */
+  /* loading / error ---------------------------------------------- */
   if (isLoading)
     return (
-      <div className="w-64 h-full flex items-center justify-center border-r border-gray-200 dark:border-gray-700">
-        <div className="w-6 h-6 border-4 border-purple-600 border-t-transparent rounded-full animate-spin" />
+      <div className="w-64 h-full flex items-center justify-center bg-sidebar border-r border-sidebar-border">
+        <div className="w-6 h-6 border-4 border-primary border-t-transparent rounded-full animate-spin" />
       </div>
     );
 
   if (error)
     return (
-      <div className="w-64 h-full flex items-center justify-center border-r border-gray-200 dark:border-gray-700">
-        <p className="text-sm text-gray-500">Error al cargar comunidades</p>
+      <div className="w-64 h-full flex items-center justify-center bg-sidebar border-r border-sidebar-border">
+        <p className="text-sm text-sidebar-foreground/70">
+          Error al cargar comunidades
+        </p>
       </div>
     );
 
-  /* UI ------------------------------------------------------------- */
+  /* UI ------------------------------------------------------------ */
   return (
-    <div className="w-64 h-full bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 flex flex-col">
-      {/* brand selector --------------------------------------------- */}
-      <div className="p-4 border-b border-gray-200 dark:border-gray-700">
+    <div className="w-64 h-full bg-sidebar border-r border-sidebar-border flex flex-col">
+      {/* brand selector -------------------------------------------- */}
+      <div className="p-4 border-b border-sidebar-border">
         {brands.length === 0 ? (
-          <p className="text-sm text-gray-500">Sin comunidades</p>
+          <p className="text-sm text-sidebar-foreground/70">
+            Sin comunidades
+          </p>
         ) : (
           <Select value={selectedBrand} onValueChange={setSelectedBrand}>
-            <SelectTrigger className="w-full">
+            <SelectTrigger className="w-full bg-secondary">
               <SelectValue placeholder="Select a brand" />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className="bg-popover">
               {brands.map((brand) => (
-                <SelectItem key={brand.id} value={brand.id}>
+                <SelectItem
+                  key={brand.id}
+                  value={brand.id}
+                  className="focus:bg-accent focus:text-accent-foreground"
+                >
                   {brand.name}
                 </SelectItem>
               ))}
@@ -93,14 +100,16 @@ export default function Sidebar() {
         )}
       </div>
 
-      {/* space groups ------------------------------------------------ */}
+      {/* space groups ---------------------------------------------- */}
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
-        <h2 className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+        <h2 className="text-xs font-semibold text-sidebar-foreground/70 uppercase tracking-wider">
           Space Groups
         </h2>
 
         {brands.length === 0 || !selectedBrand ? (
-          <p className="text-sm text-gray-500">Crea tu primera comunidad.</p>
+          <p className="text-sm text-sidebar-foreground/70">
+            Crea tu primera comunidad.
+          </p>
         ) : (
           brands
             .find((b) => b.id === selectedBrand)!
@@ -144,7 +153,6 @@ export default function Sidebar() {
                   </AccordionTrigger>
                   <AccordionContent>
                     <ul className="space-y-1 pl-4">
-                      {/* Post Spaces primero */}
                       {group.postSpaces.map((ps) => (
                         <li key={ps.id}>
                           <Link
@@ -154,15 +162,12 @@ export default function Sidebar() {
                               variant="ghost"
                               className="w-full justify-start text-sm font-normal h-8 px-2"
                             >
-                              <BookOpen className="mr-2 h-4 w-4 rotate-90" />{" "}
-                              {/* icono reutilizado */}
+                              <BookOpen className="mr-2 h-4 w-4 rotate-90" />
                               {ps.name}
                             </Button>
                           </Link>
                         </li>
                       ))}
-
-                      {/* Course Spaces */}
                       {group.courseSpaces.map((cs) => (
                         <li key={cs.id}>
                           <Link
@@ -185,7 +190,6 @@ export default function Sidebar() {
             ))
         )}
 
-        {/* diálogo edición ---------------------------------------- */}
         <EditSpaceGroupDialog
           open={!!editing}
           group={
@@ -203,10 +207,11 @@ export default function Sidebar() {
         />
       </div>
 
-      {/* theme y usuario -------------------------------------------- */}
+      {/* theme toggle & user --------------------------------------- */}
       <ThemeToggle />
+
       {user && (
-        <div className="p-4 border-t border-gray-200 dark:border-gray-700">
+        <div className="p-4 border-t border-sidebar-border">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <Avatar className="h-8 w-8">
@@ -218,7 +223,7 @@ export default function Sidebar() {
                     .join("")}
                 </AvatarFallback>
               </Avatar>
-              <span className="text-sm font-medium text-gray-800 dark:text-gray-200">
+              <span className="text-sm font-medium text-sidebar-foreground">
                 {user.fullName}
               </span>
             </div>
@@ -229,7 +234,6 @@ export default function Sidebar() {
         </div>
       )}
 
-      {/* diálogo crear nuevo ---------------------------------------- */}
       <CreateSpaceDialog
         open={!!creating}
         brandId={selectedBrand ?? ""}

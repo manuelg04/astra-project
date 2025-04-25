@@ -11,11 +11,12 @@ interface Params {
 
 /**
  *  Vista offline: usa datos dummy.
- *  Cuando conectes tu backend reemplaza `mockPosts`.
+ *  Cuando integres el backend reemplaza `mockPosts`.
  */
 export default async function PostSpacePage({ params }: { params: Params }) {
-  const { brandId, spaceGroupId, postSpaceId } = await params;
-  /* —— datos simulados ————————————————————————— */
+  const { postSpaceId } = await params;
+
+  /* —— datos simulados ——————————————————— */
   const mockPosts: Post[] = [
     {
       id: "p1",
@@ -32,24 +33,26 @@ export default async function PostSpacePage({ params }: { params: Params }) {
       authorRole: "CREATOR",
     },
   ];
-  /* ———————————————————————————————————————— */
+  /* ———————————————————————————————————— */
 
   return (
     <main className="flex flex-col gap-6 px-4 pb-12 md:px-6 lg:px-8">
       {/* cabecera + composer */}
       <header className="space-y-4">
-        <h1 className="text-2xl md:text-3xl font-bold text-gray-100">Posts</h1>
+        <h1 className="text-2xl md:text-3xl font-bold text-foreground">
+          Posts
+        </h1>
         <PostComposer postSpaceId={postSpaceId} />
       </header>
 
       {/* lista de posts */}
       <section className="space-y-4">
-        <h2 className="text-sm uppercase tracking-wider text-gray-400">
+        <h2 className="text-sm uppercase tracking-wider text-muted-foreground">
           All posts
         </h2>
 
         {mockPosts.length === 0 ? (
-          <p className="text-gray-400 text-sm">
+          <p className="text-muted-foreground text-sm">
             Aún no hay publicaciones. ¡Sé el primero en compartir algo!
           </p>
         ) : (

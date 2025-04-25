@@ -14,15 +14,13 @@ export default function PostComposer({ postSpaceId }: Props) {
 
   const onSubmit = async () => {
     if (!text.trim()) return;
-    /* Llama a tu endpoint de creación de post */
-    // await fetch("/api/posts", { ... })
+    /* TODO: llamada al endpoint de creación */
     setText("");
   };
 
   return (
-    <div className="flex items-start gap-3 rounded-lg border border-gray-700 bg-gray-800 px-4 py-3">
+    <div className="flex items-start gap-3 rounded-lg border border-border bg-card px-4 py-3">
       <Avatar className="h-9 w-9">
-        {/* sustituye por imagen del usuario */}
         <AvatarImage src="/avatar-placeholder.png" />
         <AvatarFallback>U</AvatarFallback>
       </Avatar>
@@ -31,7 +29,7 @@ export default function PostComposer({ postSpaceId }: Props) {
         value={text}
         onChange={(e) => setText(e.currentTarget.value)}
         placeholder="Share something"
-        className="flex-1 bg-gray-900 placeholder:text-gray-500"
+        className="flex-1 bg-secondary placeholder:text-muted-foreground"
       />
 
       <Button size="sm" onClick={onSubmit} disabled={!text.trim()}>
