@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { Plus, Settings, BookOpen } from "lucide-react";
+import { Plus, Settings, BookOpen, Book, MessageCircle, MousePointerSquareDashedIcon, Newspaper, School, BookUser, BookOpenText, BookOpenTextIcon, Pencil } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -121,7 +121,7 @@ export default function Sidebar() {
                 <AccordionItem value={group.id}>
                   <AccordionTrigger className="text-sm font-medium hover:no-underline justify-between w-full">
                     <div className="flex items-center gap-2">
-                      <span>{group.emoji ?? "🌐"}</span>
+                      <span>{group.emoji ?? ""}</span>
                       <span>{group.name}</span>
                     </div>
                     <div className="flex items-center gap-1 z-10">
@@ -145,7 +145,7 @@ export default function Sidebar() {
                           setEditing(group);
                         }}
                       >
-                        <Settings className="h-4 w-4" />
+                        <Pencil className="h-4 w-4" />
                       </Button>
                     </div>
                   </AccordionTrigger>
@@ -160,7 +160,7 @@ export default function Sidebar() {
                               variant="ghost"
                               className="w-full justify-start text-sm font-normal h-8 px-2"
                             >
-                              <BookOpen className="mr-2 h-4 w-4 rotate-90" />
+                              <Newspaper className="mr-2 h-4 w-4" />
                               {ps.name}
                             </Button>
                           </Link>
@@ -175,7 +175,7 @@ export default function Sidebar() {
                               variant="ghost"
                               className="w-full justify-start text-sm font-normal h-8 px-2"
                             >
-                              <BookOpen className="mr-2 h-4 w-4" />
+                              <BookOpenTextIcon className="mr-2 h-4 w-4" />
                               {cs.title}
                             </Button>
                           </Link>

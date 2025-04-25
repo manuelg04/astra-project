@@ -21,9 +21,12 @@ import {
   ArrowRight,
   ArrowLeft,
   X,
-  Info,
 } from "lucide-react";
-import { cn } from "@/lib/utils"; // Assuming you have a utility for class names
+import { cn } from "@/lib/utils";
+
+/* -------------------------------------------------------------------------- */
+/* Tipos                                                                      */
+/* -------------------------------------------------------------------------- */
 
 type CreationStep = 1 | 2;
 type SpaceKind = "POSTS" | "COURSES";
@@ -33,10 +36,13 @@ interface Props {
   brandId: string;
   group: SpaceGroupSummary | null;
   onClose: () => void;
-  onCreated: () => void; // disparar mutateBrandsTree
+  onCreated: () => void;
 }
 
-// Helper component for Step 2 selection items
+/* -------------------------------------------------------------------------- */
+/* Selector de tipo de Space                                                  */
+/* -------------------------------------------------------------------------- */
+
 const SpaceKindSelector = ({
   id,
   icon: Icon,
@@ -55,44 +61,43 @@ const SpaceKindSelector = ({
   <label
     htmlFor={`kind-${id}`}
     className={cn(
-      "flex items-start gap-4 cursor-pointer rounded-lg border p-4 transition-all duration-200 ease-in-out",
+      "flex cursor-pointer items-start gap-4 rounded-lg border p-4 transition-all duration-200 ease-in-out",
       checked
-        ? "border-blue-500 bg-blue-50 ring-2 ring-blue-500/50 dark:bg-blue-900/30 dark:border-blue-700"
-        : "border-gray-200 hover:border-gray-300 dark:border-gray-700 dark:hover:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800/50",
+        ? "border-blue-500 bg-blue-900/30 ring-2 ring-blue-500/50"
+        : "border-gray-700 hover:border-blue-600 hover:bg-blue-900/25",
     )}
   >
     <Checkbox
       id={`kind-${id}`}
       checked={checked}
       onCheckedChange={onCheckedChange}
-      className="mt-1 h-5 w-5 rounded border-gray-300 data-[state=checked]:bg-blue-600 data-[state=checked]:text-white dark:border-gray-600"
+      className="mt-1 h-5 w-5 rounded border-gray-600 data-[state=checked]:bg-blue-600 data-[state=checked]:text-white"
       aria-labelledby={`title-${id}`}
       aria-describedby={`desc-${id}`}
     />
     <div className="flex-1">
       <span
         id={`title-${id}`}
-        className="text-base font-semibold flex items-center gap-2 text-gray-800 dark:text-gray-100"
+        className="flex items-center gap-2 text-base font-semibold text-gray-200"
       >
         <Icon
           className={cn(
             "h-5 w-5",
-            checked
-              ? "text-blue-600 dark:text-blue-400"
-              : "text-gray-500 dark:text-gray-400",
+            checked ? "text-blue-400" : "text-gray-300",
           )}
         />
         {title}
       </span>
-      <p
-        id={`desc-${id}`}
-        className="text-sm text-gray-500 dark:text-gray-400 mt-1"
-      >
+      <p id={`desc-${id}`} className="mt-1 text-sm text-gray-400">
         {description}
       </p>
     </div>
   </label>
 );
+
+/* -------------------------------------------------------------------------- */
+/* Componente principal                                                       */
+/* -------------------------------------------------------------------------- */
 
 export default function CreateSpaceDialog({
   open,
@@ -101,10 +106,11 @@ export default function CreateSpaceDialog({
   onClose,
   onCreated,
 }: Props) {
-  /* pasos internos -------------------------------------------------- */
   const [step, setStep] = useState<CreationStep>(1);
   const [spaceKinds, setSpaceKinds] = useState<Set<SpaceKind>>(new Set());
   const [isCreating, setIsCreating] = useState(false);
+
+  /* ------------------------------ Auxiliares ----------------------------- */
 
   const reset = () => {
     setStep(1);
@@ -113,7 +119,14 @@ export default function CreateSpaceDialog({
     onClose();
   };
 
-  /* creación -------------------------------------------------------- */
+  const handleSpaceKindChange = (kind: SpaceKind, checked: boolean) => {
+    const next = new Set(spaceKinds);
+    checked ? next.add(kind) : next.delete(kind);
+    setSpaceKinds(next);
+  };
+
+  /* ------------------------------- Crear --------------------------------- */
+
   async function handleCreate() {
     if (spaceKinds.size === 0) {
       toast({
@@ -136,7 +149,7 @@ export default function CreateSpaceDialog({
     const errors: string[] = [];
 
     try {
-      // Create Post Space if selected
+      /* Post-Space -------------------------------------------------------- */
       if (spaceKinds.has("POSTS")) {
         try {
           const res = await fetch(
@@ -147,16 +160,14 @@ export default function CreateSpaceDialog({
                 "Content-Type": "application/json",
                 Authorization: `Bearer ${token}`,
               },
-              body: JSON.stringify({ name: "Posts", description: null }), // Consider allowing custom names later
+              body: JSON.stringify({ name: "Posts", description: null }),
             },
           );
           if (!res.ok) {
-            const errorData = await res
+            const { message } = await res
               .json()
               .catch(() => ({ message: "Error al crear espacio de Posts" }));
-            throw new Error(
-              errorData.message || "Error al crear espacio de Posts",
-            );
+            throw new Error(message);
           }
           createdCount++;
         } catch (err) {
@@ -164,7 +175,7 @@ export default function CreateSpaceDialog({
         }
       }
 
-      // Create Course Space if selected
+      /* Course-Space ------------------------------------------------------ */
       if (spaceKinds.has("COURSES")) {
         try {
           const res = await fetch(
@@ -175,16 +186,14 @@ export default function CreateSpaceDialog({
                 "Content-Type": "application/json",
                 Authorization: `Bearer ${token}`,
               },
-              body: JSON.stringify({ title: "Cursos", description: null }), // API expects 'title'
+              body: JSON.stringify({ title: "Cursos", description: null }),
             },
           );
           if (!res.ok) {
-            const errorData = await res
+            const { message } = await res
               .json()
               .catch(() => ({ message: "Error al crear espacio de Cursos" }));
-            throw new Error(
-              errorData.message || "Error al crear espacio de Cursos",
-            );
+            throw new Error(message);
           }
           createdCount++;
         } catch (err) {
@@ -192,27 +201,25 @@ export default function CreateSpaceDialog({
         }
       }
 
-      // Handle results
+      /* Resultados -------------------------------------------------------- */
       if (createdCount > 0 && errors.length === 0) {
         toast({
           title: "¡Espacio(s) creado(s)!",
           description: `Se ${createdCount === 1 ? "ha" : "han"} añadido correctamente.`,
         });
-        onCreated(); // refetch global
+        onCreated();
         reset();
       } else if (createdCount > 0 && errors.length > 0) {
         toast({
-          variant: "default", // Use a warning variant if available
           title: "Creación parcial",
-          description: `Se crearon ${createdCount} espacio(s), pero ${errors.length} fallaron: ${errors.join("; ")}`,
+          description: `Se crearon ${createdCount} espacio(s), pero ${errors.length} fallaron: ${errors.join(
+            "; ",
+          )}`,
         });
-        onCreated(); // refetch even if partial
+        onCreated();
         reset();
       } else {
-        // All failed
-        throw new Error(
-          errors.join("; ") || "No se pudo crear ningún espacio.",
-        );
+        throw new Error(errors.join("; ") || "No se pudo crear ningún espacio.");
       }
     } catch (err) {
       toast({
@@ -225,36 +232,28 @@ export default function CreateSpaceDialog({
     }
   }
 
-  const handleSpaceKindChange = (kind: SpaceKind, checked: boolean) => {
-    const next = new Set(spaceKinds);
-    if (checked) {
-      next.add(kind);
-    } else {
-      next.delete(kind);
-    }
-    setSpaceKinds(next);
-  };
+  /* ------------------------------ Render --------------------------------- */
 
-  /* ----------------------------- UI ------------------------------- */
   return (
     <Dialog open={open} onOpenChange={(isOpen) => !isOpen && reset()}>
-      <DialogContent className="sm:max-w-4xl bg-card border border-border p-0">
+      <DialogContent className="border border-border bg-card p-0 sm:max-w-4xl">
+        {/* Paso 1 ---------------------------------------------------------- */}
         {step === 1 && group && (
           <Fragment>
-            <DialogHeader className="p-6 pb-4 border-b border-border">
-              <DialogTitle className="text-xl font-bold flex items-center gap-2 text-foreground">
+            <DialogHeader className="border-b border-border p-6 pb-4">
+              <DialogTitle className="flex items-center gap-2 text-xl font-bold text-foreground">
                 <FolderPlus className="h-5 w-5 text-primary" />
                 Crear nueva entidad en {group.name}
               </DialogTitle>
-              <DialogDescription className="text-muted-foreground mt-1">
+              <DialogDescription className="mt-1 text-muted-foreground">
                 Elige qué tipo de contenido quieres añadir a este grupo.
               </DialogDescription>
             </DialogHeader>
 
-            <div className="p-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {/* Próximamente */}
+            <div className="grid grid-cols-1 gap-4 p-6 sm:grid-cols-2">
+              {/* Próximamente ------------------------------------------------ */}
               <div
-                className="relative group flex flex-col items-center justify-center p-6 rounded-lg border-2 border-dashed border-border text-center opacity-60 cursor-not-allowed bg-muted/10"
+                className="group relative flex cursor-not-allowed flex-col items-center justify-center rounded-lg border-2 border-dashed border-border p-6 text-center opacity-60 bg-muted/10"
                 onClick={() =>
                   toast({
                     title: "Próximamente",
@@ -263,32 +262,32 @@ export default function CreateSpaceDialog({
                   })
                 }
               >
-                <FolderPlus className="h-10 w-10 text-muted-foreground mb-3" />
+                <FolderPlus className="mb-3 h-10 w-10 text-muted-foreground" />
                 <span className="font-semibold text-foreground">
                   Space Group
                 </span>
-                <p className="text-xs text-muted-foreground mt-1">
+                <p className="mt-1 text-xs text-muted-foreground">
                   Organiza spaces relacionados.
                 </p>
-                <span className="absolute top-2 right-2 bg-yellow-600/20 text-yellow-300 text-xs font-semibold px-2 py-0.5 rounded-full">
+                <span className="absolute right-2 top-2 rounded-full bg-yellow-600/20 px-2 py-0.5 text-xs font-semibold text-yellow-300">
                   Pronto
                 </span>
               </div>
 
-              {/* Botón Space */}
+              {/* Botón Space ------------------------------------------------- */}
               <button
-                className="group flex flex-col items-center justify-center p-6 rounded-lg border border-border text-center transition-all hover:border-primary hover:bg-primary/10 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+                className="group flex flex-col items-center justify-center rounded-lg border border-border p-6 text-center transition-all hover:border-primary hover:bg-primary/10 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
                 onClick={() => setStep(2)}
               >
-                <FileText className="h-10 w-10 text-primary group-hover:text-primary/80 mb-3 transition-colors" />
+                <FileText className="mb-3 h-10 w-10 text-primary transition-colors group-hover:text-primary/80" />
                 <span className="font-semibold text-foreground">Space</span>
-                <p className="text-xs text-muted-foreground mt-1">
+                <p className="mt-1 text-xs text-muted-foreground">
                   Contiene Posts o Cursos.
                 </p>
               </button>
             </div>
 
-            <DialogFooter className="p-6 pt-4 border-t border-border bg-muted/10">
+            <DialogFooter className="border-t border-border bg-muted/10 p-6 pt-4">
               <Button
                 variant="ghost"
                 onClick={reset}
@@ -301,28 +300,27 @@ export default function CreateSpaceDialog({
           </Fragment>
         )}
 
+        {/* Paso 2 ---------------------------------------------------------- */}
         {step === 2 && group && (
           <Fragment>
-            <DialogHeader className="p-6 pb-4 border-b border-border">
+            <DialogHeader className="border-b border-border p-6 pb-4">
               <DialogTitle className="text-xl font-bold text-foreground">
                 Configura tu nuevo Space
               </DialogTitle>
-              <DialogDescription className="text-muted-foreground mt-1">
+              <DialogDescription className="mt-1 text-muted-foreground">
                 Selecciona qué funcionalidades tendrá este space. Puedes elegir
                 una o ambas.
               </DialogDescription>
             </DialogHeader>
 
-            <div className="p-6 space-y-4">
+            <div className="space-y-4 p-6">
               <SpaceKindSelector
                 id="POSTS"
                 icon={FileText}
                 title="Posts"
                 description="Para compartir anuncios, noticias y actualizaciones."
                 checked={spaceKinds.has("POSTS")}
-                onCheckedChange={(checked) =>
-                  handleSpaceKindChange("POSTS", checked)
-                }
+                onCheckedChange={(c) => handleSpaceKindChange("POSTS", c)}
               />
               <SpaceKindSelector
                 id="COURSES"
@@ -330,13 +328,11 @@ export default function CreateSpaceDialog({
                 title="Cursos"
                 description="Para organizar y gestionar contenido educativo."
                 checked={spaceKinds.has("COURSES")}
-                onCheckedChange={(checked) =>
-                  handleSpaceKindChange("COURSES", checked)
-                }
+                onCheckedChange={(c) => handleSpaceKindChange("COURSES", c)}
               />
             </div>
 
-            <DialogFooter className="p-6 pt-4 border-t border-border bg-muted/10 flex justify-between">
+            <DialogFooter className="border-t border-border bg-muted/10 flex justify-between p-6 pt-4">
               <Button
                 variant="ghost"
                 onClick={() => setStep(1)}
@@ -358,7 +354,7 @@ export default function CreateSpaceDialog({
                   {isCreating ? (
                     <>
                       <svg
-                        className="animate-spin -ml-1 mr-2 h-4 w-4"
+                        className="-ml-1 mr-2 h-4 w-4 animate-spin"
                         xmlns="http://www.w3.org/2000/svg"
                         fill="none"
                         viewBox="0 0 24 24"
