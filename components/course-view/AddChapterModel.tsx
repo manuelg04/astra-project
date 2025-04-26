@@ -48,7 +48,7 @@ export default function AddChapterModal(props: Props) {
         props.courseId,
         { title: parsed.data.title.trim() },
       );
-      props.onCreated(chapter);     // ← notificar al padre
+      props.onCreated(chapter); // ← notificar al padre
       setOpen(false);
       setTitle("");
     } catch (err: any) {

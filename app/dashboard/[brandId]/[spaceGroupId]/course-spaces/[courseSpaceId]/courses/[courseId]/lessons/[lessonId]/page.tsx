@@ -13,13 +13,7 @@ interface Params {
 }
 
 export default async function LessonPage({ params }: { params: Params }) {
-  const {
-    brandId,
-    spaceGroupId,
-    courseSpaceId,
-    courseId,
-    lessonId,
-  } = params;
+  const { brandId, spaceGroupId, courseSpaceId, courseId, lessonId } = params;
 
   /* 1 · Obtener curso + chapters + lesson seleccionada */
   const course = await prisma.course.findFirst({

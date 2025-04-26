@@ -12,6 +12,7 @@ model User {
   postslikes PostLike[]
   spaceGroupMembers SpaceGroupMember[]
   brandMembers BrandMember[]
+  transactions Transaction[]
   @@index([phone])
   @@index([createdAt])
   @@map("users")

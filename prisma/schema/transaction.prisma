@@ -1,0 +1,17 @@
+model Transaction {
+  id String @id @default(cuid())
+  spaceGroupId String
+  spaceGroup   SpaceGroup @relation(fields: [spaceGroupId], references: [id])
+  amount Int
+  creator_revenue Int
+  platform_revenue Int
+  currency String
+  type String
+  status String
+  customSessionId String
+  customerId String
+  transactionEmail String
+  customer User @relation(fields: [customerId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}

@@ -15,6 +15,7 @@ model SpaceGroup {
   courseSpaces CourseSpace[]
   postSpaces   PostSpace[] 
   members      SpaceGroupMember[]
+  transactions Transaction[]
   @@index([brandId])
   @@map("space_groups")
 }
